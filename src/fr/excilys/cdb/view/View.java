@@ -6,15 +6,31 @@ import java.util.Scanner;
 import database.Pageable;
 import fr.excilys.cdb.controller.ControllerCompany;
 import fr.excilys.cdb.controller.ControllerComputer;
+import fr.excilys.cdb.model.Company;
 
 public class View {
-
+	
+	final private String LIST_COMPUTERS = "1";
+	final private String LIST_COMPANIES = "2";
+	final private String SHOW_SPECIFIC_COMPUTER = "3";
+	final private String CERATE_COMPUTER = "4";
+	final private String UPDATE_COMPUTER = "5";
+	final private String DELETE_COMPUTER = "6";
+	
+	final private String CASE_PREVIOUS = "1";
+	final private String CASE_NEXT = "2";
+	
+	public final static int UPDATE_MANUFACTURER_NAME = 1;
+	public final static int UPDATE_COMPANY_NAME = 2;
+	public final static int UPDATE_INTRODUCED_DATE = 3;
+	public final static int UPDATE_DISCONTINUED_DATE = 4;
+	
+	
 	private Scanner scanner = new Scanner(System.in);
 	private ControllerCompany controllerCompany;
 	private ControllerComputer controllerComputer;
 	
 	public View() {
-		
 	}
 
 	public void client() throws ParseException{
@@ -22,15 +38,14 @@ public class View {
 		boolean continueBoolean = true;
 		
 		while(continueBoolean) {
-			System.out.println("");
-			System.out.println("What do you want to do ?");
-			System.out.println("1 : List computers"); //OK
-			System.out.println("2 : List companies"); //OK
-			System.out.println("3 : Show computer details"); //OK
-			System.out.println("4 : Create a computer"); 
-			System.out.println("5 : Update a computer"); 
-			System.out.println("6 : Delete a computer"); //OK
-			System.out.println("Other : Exit");
+			System.out.println("\n What do you want to do ?"
+					+ "\n " + LIST_COMPUTERS + " : List computers"
+					+ "\n " + LIST_COMPANIES + " : List companies"
+					+ "\n " + SHOW_SPECIFIC_COMPUTER + " : Show computer details"
+					+ "\n " + CERATE_COMPUTER + " : Create a computer"
+					+ "\n " + UPDATE_COMPUTER + " : Update a computer"
+					+ "\n " + DELETE_COMPUTER + " : Delete a computer"
+					+ "\n Other : Exit");
 			choice = scanner.next();
 			continueBoolean = getChoiceFunction(choice);
 			
@@ -42,12 +57,12 @@ public class View {
 	public boolean getChoiceFunction(String choice) throws ParseException{
 		boolean result = true;
 		switch(choice) {
-			case "1": listComputers(); break;
-			case "2": listCompanies(); break;
-			case "3": controllerComputer.showComputerDetails(); break;
-			case "4": controllerComputer.createComputer(); break;
-			case "5": controllerComputer.updateComputer(); break;
-			case "6": controllerComputer.deleteComputer(); break;
+			case LIST_COMPUTERS: listComputers(); break;
+			case LIST_COMPANIES: listCompanies(); break;
+			case SHOW_SPECIFIC_COMPUTER: controllerComputer.showComputerDetails(); break;
+			case CERATE_COMPUTER: controllerComputer.createComputer(); break;
+			case UPDATE_COMPUTER: controllerComputer.updateComputer(); break;
+			case DELETE_COMPUTER: controllerComputer.deleteComputer(); break;
 			default: result = false; System.out.println("bye");
 		
 		}
@@ -58,14 +73,8 @@ public class View {
 		boolean exit = true;
 		Pageable pageable = new Pageable();
 		do {
-			controllerComputer.listComputersPageable(pageable.getOffset(),pageable.getLimit());
-			System.out.println("<-- Previous(1)    Exit(Other)       Next(2) -->");
-			String choice = scanner.next();
-			switch(choice) {
-			case "1": pageable.previous();break;
-			case "2": pageable.next();break;
-			default: exit = false;
-			}
+			controllerComputer.listComputersPageable(pageable);
+			exit = pageableHandler(pageable);
 		}while(exit);
 	}
 	
@@ -74,22 +83,120 @@ public class View {
 		Pageable pageable = new Pageable();
 		do {
 			controllerCompany.listCompaniesPageable(pageable.getOffset(),pageable.getLimit());
-			System.out.println("<-- Previous(1)    Exit(Other)       Next(2) -->");
-			String choice = scanner.next();
-			switch(choice) {
-			case "1": pageable.previous();break;
-			case "2": pageable.next();break;
-			default: exit = false;
-			}
+			exit = pageableHandler(pageable);
 		}while(exit);
 	}
+
+	private boolean pageableHandler(Pageable pageable) {
+		boolean exit;
+		navigatePreviousNext();
+		String choice = scanner.next();
+		switch(choice) {
+		case CASE_PREVIOUS: pageable.previous();exit = true;break;
+		case CASE_NEXT: pageable.next();exit = true;break;
+		default: exit = false;
+		}
+		return exit;
+	}
 	
-	
-	
-	public void setControllers(ControllerCompany controllerCompany, ControllerComputer controllerComputer) {
-		this.controllerCompany = controllerCompany;
-		this.controllerComputer = controllerComputer;
+	public void printCompany(Company company) {
+		System.out.println(company.toString());
 		
+	}
+
+	public void enterInsertComputer() {
+		System.out.println("--- Insert a Computer ---");
+		
+	}
+
+	public String getComputerName() {
+		System.out.println("Name of the computer (press ENTER key if you don't have the name) : ");
+		return scanner.nextLine();
+	}
+
+	public String getCompanyName() {
+		System.out.println("Name of the company (press ENTER key if you don't have the name) : ");
+		return scanner.nextLine();
+	}
+	
+	public String getIntroducedDate() {
+		System.out.println("Introduced date of the computer (press ENTER key if you don't have the date) dd/mm/yyyy : ");
+		return scanner.nextLine();
+	}
+
+	public String getDiscontinuedDate() {
+		System.out.println("Discontinued date of the computer (press ENTER key if you don't have the date) dd/mm/yyyy : ");
+		return scanner.nextLine();
+	}
+	
+	private void navigatePreviousNext() {
+		System.out.println("<-- Previous(" + CASE_PREVIOUS + ")       Exit(Other)       Next(" + CASE_NEXT + ") -->");
+	}
+
+	public ControllerCompany getControllerCompany() {
+		return controllerCompany;
+	}
+
+	public void setControllerCompany(ControllerCompany controllerCompany) {
+		this.controllerCompany = controllerCompany;
+	}
+
+	public ControllerComputer getControllerComputer() {
+		return controllerComputer;
+	}
+
+	public void setControllerComputer(ControllerComputer controllerComputer) {
+		this.controllerComputer = controllerComputer;
+	}
+
+	public void enterShowComputerDetails() {
+		System.out.println("--- Show Computer Details ---");
+		
+	}
+
+	public int getComputerId() {
+		System.out.println("Which computer id ?");
+		return scanner.nextInt();
+	}
+
+	public void enterUpdaterComputer() {
+		System.out.println("--- Update Computer ---");
+		
+	}
+
+	public int getUpdateChoice() {
+		System.out.println("What do you want to update ? (" + UPDATE_MANUFACTURER_NAME + "," + UPDATE_MANUFACTURER_NAME + "," + UPDATE_INTRODUCED_DATE + ", + UPDATE_DISCONTINUED_DATE + )");
+		return scanner.nextInt();
+	}
+
+	public String askNewManufacturer() {
+
+		System.out.println("new manufacturer name : ");
+		return scanner.next();
+	}
+
+	public String askNewCompanyName() {
+		System.out.println("new computer name : ");
+		return scanner.next();
+	}
+
+	public String askNewIntroducedDate() {
+		System.out.println("new introduced date (dd/mm/yyyy) : ");
+		return scanner.next();
+	}
+
+	public String askNewDiscontinuedDate() {
+		System.out.println("new discontinued date (dd/mm/yyyy) : ");
+		return scanner.next();
+	}
+
+	public void enterDeleteComputer() {
+		System.out.println("--- Delete Computer ---");		
+	}
+
+	public int askComputerId() {
+		System.out.println("Which computer id ?");
+		return scanner.nextInt();
 	}
 
 }

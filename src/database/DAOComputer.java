@@ -29,16 +29,16 @@ public class DAOComputer {
 		return connectionHandler.query(request);
 	}
 	
-	public ResultSet listComputersPageable(int offset, int limit) {
+	public ResultSet listComputersPageable(Pageable pageable) {
 		ResultSet resultSet = null;
 		Connection connection = connectionHandler.getConnection();
+		String request = "SELECT * FROM computer JOIN company ON company.id = computer.company_id limit ? offset ?";
 		try {
-			PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM computer JOIN company ON company.id = computer.company_id limit ? offset ?");
-			preparedStatement.setInt(1, limit);
-			preparedStatement.setInt(2, offset);
+			PreparedStatement preparedStatement = connection.prepareStatement(request);
+			preparedStatement.setInt(1, pageable.getLimit());
+			preparedStatement.setInt(2, pageable.getOffset());
 			resultSet = preparedStatement.executeQuery(); 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 		return resultSet;

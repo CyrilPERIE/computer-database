@@ -108,6 +108,14 @@ public class Computer {
 		
 	}
 	
+	public void listElements() {
+		System.out.println("1 manufacturer : " + manufacturer.getName());
+		System.out.println("2 computer name : " + name);
+		System.out.println("3 introducedDate : " + introducedDate);
+		System.out.println("4 discontinuedDate : " + discontinuedDate);
+		
+	}
+	
 	/*
 	 * ------------------------------------------
 	 * |             SETTER & GETTER            |
@@ -154,11 +162,4 @@ public class Computer {
 		this.discontinuedDate = discontinuedDate;
 	}
 
-	public void listElements() {
-		System.out.println("1 manufacturer : " + manufacturer.getName());
-		System.out.println("2 computer name : " + name);
-		System.out.println("3 introducedDate : " + introducedDate);
-		System.out.println("4 discontinuedDate : " + discontinuedDate);
-		
-	}
 }

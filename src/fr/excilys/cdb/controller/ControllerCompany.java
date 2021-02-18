@@ -5,14 +5,16 @@ import java.sql.SQLException;
 
 import database.DAOCompany;
 import fr.excilys.cdb.model.Company;
-import fr.excilys.cdb.model.Computer;
+import fr.excilys.cdb.view.View;
 
 public class ControllerCompany {
 
 	protected static DAOCompany queriesCompany;
+	private View view;
 
-	public ControllerCompany() {
+	public ControllerCompany(View view) {
 		queriesCompany = DAOCompany.getQueriesCompanyInstance();
+		this.view = view;
 	}
 
 	/*
@@ -27,7 +29,7 @@ public class ControllerCompany {
 			while (resultSet.next()) {
 				Company company = new Company.CompanyBuilder().computerId(resultSet.getInt("company.id"))
 						.computerName(resultSet.getString("company.name")).build();
-				System.out.println(company.toString());
+				view.printCompany(company);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -39,7 +41,7 @@ public class ControllerCompany {
 		try {
 			while (resultSet.next()) {
 				Company company = resultSetToCompanyObject(resultSet);
-				System.out.println(company.toString());
+				view.printCompany(company);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

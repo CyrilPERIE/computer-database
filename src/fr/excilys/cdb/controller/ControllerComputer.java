@@ -3,20 +3,21 @@ package fr.excilys.cdb.controller;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.Scanner;
 
 import database.DAOComputer;
 import database.Pageable;
 import fr.excilys.cdb.model.Company;
 import fr.excilys.cdb.model.Computer;
+import fr.excilys.cdb.view.View;
 
 public class ControllerComputer {
 
 	protected static DAOComputer daoComputer;
-	Scanner scanner = new Scanner(System.in);
-
-	public ControllerComputer() {
+	private View view;
+	
+	public ControllerComputer(View view) {
 		daoComputer = DAOComputer.getQueriesComputerInstance();
+		this.view = view;
 	}
 
 	/*
@@ -37,8 +38,8 @@ public class ControllerComputer {
 		}
 	}
 
-	public void listComputersPageable(int offset, int limit) {
-		ResultSet resultSet = daoComputer.listComputersPageable(offset, limit);
+	public void listComputersPageable(Pageable pageable) {
+		ResultSet resultSet = daoComputer.listComputersPageable(pageable);
 		try {
 			while (resultSet.next()) {
 				Computer computer = resultSetToComputerObject(resultSet);
@@ -57,17 +58,11 @@ public class ControllerComputer {
 	 */
 
 	public void createComputer() throws ParseException {
-		System.out.println("--- Insert a Computer ---");
-		System.out.println("Name of the computer (press ENTER key if you don't have the name) : ");
-		String computerName = scanner.nextLine();
-		System.out.println("Name of the company (press ENTER key if you don't have the name) : ");
-		String companyName = scanner.nextLine();
-		System.out
-				.println("Introduced date of the computer (press ENTER key if you don't have the date) dd/mm/yyyy : ");
-		String introducedDate = scanner.nextLine();
-		System.out.println(
-				"Discontinued date of the computer (press ENTER key if you don't have the date) dd/mm/yyyy : ");
-		String discontinuedDate = scanner.nextLine();
+		view.enterInsertComputer();
+		String computerName = view.getComputerName();
+		String companyName = view.getCompanyName();
+		String introducedDate = view.getIntroducedDate();
+		String discontinuedDate = view.getDiscontinuedDate();
 
 		int companyId = ControllerCompany.queriesCompany.getIdCompany(companyName);
 
@@ -76,9 +71,8 @@ public class ControllerComputer {
 	}
 
 	public void showComputerDetails() {
-		System.out.println("--- Show Computer Details ---");
-		System.out.println("Which computer id ?");
-		int computerId = scanner.nextInt();
+		view.enterShowComputerDetails();
+		int computerId = view.getComputerId();
 		ResultSet resultSet = daoComputer.showComputerDetails(computerId);
 		try {
 			resultSet.next();
@@ -90,9 +84,8 @@ public class ControllerComputer {
 	}
 
 	public void updateComputer() throws ParseException {
-		System.out.println("--- Update Computer ---");
-		System.out.println("Which computer id ?");
-		int computerId = scanner.nextInt();
+		view.enterUpdaterComputer();
+		int computerId = view.getComputerId();
 		ResultSet resultSet = daoComputer.showComputerDetails(computerId);
 		try {
 			resultSet.next();
@@ -101,38 +94,36 @@ public class ControllerComputer {
 		}
 		Computer computer = resultSetToComputerObject(resultSet);
 		computer.listElements();
-		System.out.println("What do you want to update ? (1,2,3,4)");
-		updateChoice(scanner.nextInt(), computerId);
+		int updateChoice = view.getUpdateChoice();
+		updateChoice(updateChoice, computerId);
 
 	}
 
 	private void updateChoice(int updateChoice, int computerId) throws ParseException {
 		switch (updateChoice) {
-		case 1:
-			System.out.println("new manufacturer name : ");
-			String manufacturer = scanner.next();
+		case View.UPDATE_MANUFACTURER_NAME:
+			String manufacturer = view.askNewManufacturer();
 			int companyId = ControllerCompany.queriesCompany.getIdCompany(manufacturer);
 			daoComputer.updateManufacturer(companyId, computerId);
 			break;
-		case 2:
-			System.out.println("new computer name : ");
-			daoComputer.updateComputerName(scanner.next(), computerId);
+		case View.UPDATE_COMPANY_NAME:
+			String newCompanyName = view.askNewCompanyName();
+			daoComputer.updateComputerName(newCompanyName, computerId);
 			break;
-		case 3:
-			System.out.println("new introduced date (dd/mm/yyyy) : ");
-			daoComputer.updateIntroducedDate(Utilitaire.stringToDate(scanner.next()), computerId);
+		case View.UPDATE_INTRODUCED_DATE:
+			String newIntroducedDate = view.askNewIntroducedDate();
+			daoComputer.updateIntroducedDate(Utilitaire.stringToDate(newIntroducedDate), computerId);
 			break;
-		case 4:
-			System.out.println("new discontinued date (dd/mm/yyyy) : ");
-			daoComputer.updateDiscontinuedDate(Utilitaire.stringToDate(scanner.next()), computerId);
+		case View.UPDATE_DISCONTINUED_DATE:
+			String newDiscontinuedDate = view.askNewDiscontinuedDate();
+			daoComputer.updateDiscontinuedDate(Utilitaire.stringToDate(newDiscontinuedDate), computerId);
 		}
 
 	}
 
 	public void deleteComputer() {
-		System.out.println("--- Delete Computer ---");
-		System.out.println("Which computer id ?");
-		int computerId = scanner.nextInt();
+		view.enterDeleteComputer();;
+		int computerId = view.askComputerId();
 		daoComputer.deleteComputer(computerId);
 
 	}

@@ -9,11 +9,11 @@ import fr.excilys.cdb.view.View;
 public class Main {
 
 	public static void main(String[] args) throws ParseException {
-		
 		View view = new View();
-		ControllerCompany controllerCompany = new ControllerCompany();
-		ControllerComputer controllerComputer = new ControllerComputer();
-		view.setControllers(controllerCompany,controllerComputer);
+		ControllerCompany controllerCompany = new ControllerCompany(view);
+		ControllerComputer controllerComputer = new ControllerComputer(view);
+		view.setControllerCompany(controllerCompany);
+		view.setControllerComputer(controllerComputer);
 		view.client();
 		
 		
