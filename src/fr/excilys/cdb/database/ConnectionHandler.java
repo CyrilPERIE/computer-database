@@ -1,4 +1,4 @@
-package database;
+package fr.excilys.cdb.database;
 
 import java.sql.DriverManager;
 import java.sql.ResultSet;

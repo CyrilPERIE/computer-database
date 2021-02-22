@@ -4,16 +4,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 
-import database.DAOComputer;
-import database.Pageable;
+import fr.excilys.cdb.database.DAOComputer;
+import fr.excilys.cdb.database.Pageable;
 import fr.excilys.cdb.model.Company;
 import fr.excilys.cdb.model.Computer;
+import fr.excilys.cdb.services.LoggerInstance;
 import fr.excilys.cdb.view.View;
 
 public class ControllerComputer {
 
 	protected static DAOComputer daoComputer;
 	private View view;
+	LoggerInstance loggerInstance = LoggerInstance.getLoggerInstance();
 	
 	public ControllerComputer(View view) {
 		daoComputer = DAOComputer.getQueriesComputerInstance();
@@ -26,7 +28,7 @@ public class ControllerComputer {
 	 * ------------------------------------------
 	 */
 
-	public void listComputers() {
+	public void listComputers() throws SQLException {
 		ResultSet resultSet = daoComputer.listComputers();
 		try {
 			while (resultSet.next()) {
@@ -34,11 +36,11 @@ public class ControllerComputer {
 				computerToString(computer);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw e;
 		}
 	}
 
-	public void listComputersPageable(Pageable pageable) {
+	public void listComputersPageable(Pageable pageable) throws SQLException {
 		ResultSet resultSet = daoComputer.listComputersPageable(pageable);
 		try {
 			while (resultSet.next()) {
@@ -46,7 +48,7 @@ public class ControllerComputer {
 				computerToString(computer);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw e;
 		}
 
 	}
@@ -70,27 +72,27 @@ public class ControllerComputer {
 				Utilitaire.stringToDate(discontinuedDate));
 	}
 
-	public void showComputerDetails() {
+	public void showComputerDetails() throws SQLException {
 		view.enterShowComputerDetails();
 		int computerId = view.getComputerId();
 		ResultSet resultSet = daoComputer.showComputerDetails(computerId);
 		try {
 			resultSet.next();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw e;
 		}
 		Computer computer = resultSetToComputerObject(resultSet);
 		computerToString(computer);
 	}
 
-	public void updateComputer() throws ParseException {
+	public void updateComputer() throws ParseException, SQLException {
 		view.enterUpdaterComputer();
 		int computerId = view.getComputerId();
 		ResultSet resultSet = daoComputer.showComputerDetails(computerId);
 		try {
 			resultSet.next();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw e;
 		}
 		Computer computer = resultSetToComputerObject(resultSet);
 		computer.listElements();
@@ -106,8 +108,8 @@ public class ControllerComputer {
 			int companyId = ControllerCompany.queriesCompany.getIdCompany(manufacturer);
 			daoComputer.updateManufacturer(companyId, computerId);
 			break;
-		case View.UPDATE_COMPANY_NAME:
-			String newCompanyName = view.askNewCompanyName();
+		case View.UPDATE_COMPUTER_NAME:
+			String newCompanyName = view.askNewComputerName();
 			daoComputer.updateComputerName(newCompanyName, computerId);
 			break;
 		case View.UPDATE_INTRODUCED_DATE:
@@ -134,7 +136,7 @@ public class ControllerComputer {
 	 * ------------------------------------------
 	 */
 
-	private Computer resultSetToComputerObject(ResultSet resultSet) {
+	private Computer resultSetToComputerObject(ResultSet resultSet) throws SQLException {
 		Computer computer = null;
 		try {
 			Company company = new Company.CompanyBuilder().computerId(resultSet.getInt("computer.id"))
@@ -146,7 +148,7 @@ public class ControllerComputer {
 					.computerDiscontinuedDate(resultSet.getDate("computer.discontinued")).build();
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw e;
 		}
 		return computer;
 	}

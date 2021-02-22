@@ -3,7 +3,7 @@ package fr.excilys.cdb.controller;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import database.DAOCompany;
+import fr.excilys.cdb.database.DAOCompany;
 import fr.excilys.cdb.model.Company;
 import fr.excilys.cdb.view.View;
 
@@ -22,7 +22,7 @@ public class ControllerCompany {
 	 * ------------------------------------------
 	 */
 
-	public void listCompanies() {
+	public void listCompanies() throws SQLException {
 
 		ResultSet resultSet = queriesCompany.listCompanies();
 		try {
@@ -32,11 +32,11 @@ public class ControllerCompany {
 				view.printCompany(company);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw e;
 		}
 	}
 
-	public void listCompaniesPageable(int offset, int limit) {
+	public void listCompaniesPageable(int offset, int limit) throws SQLException {
 		ResultSet resultSet = queriesCompany.listComputersPageable(offset, limit);
 		try {
 			while (resultSet.next()) {
@@ -44,19 +44,19 @@ public class ControllerCompany {
 				view.printCompany(company);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw e;
 		}
 
 	}
 
-	private Company resultSetToCompanyObject(ResultSet resultSet) {
+	private Company resultSetToCompanyObject(ResultSet resultSet) throws SQLException {
 		Company company = null;
 		try {
 			company = new Company.CompanyBuilder().computerId(resultSet.getInt("id"))
 					.computerName(resultSet.getString("name")).build();
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw e;
 		}
 		return company;
 	}

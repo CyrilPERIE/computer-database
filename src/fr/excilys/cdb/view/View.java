@@ -1,12 +1,14 @@
 package fr.excilys.cdb.view;
 
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Scanner;
 
-import database.Pageable;
 import fr.excilys.cdb.controller.ControllerCompany;
 import fr.excilys.cdb.controller.ControllerComputer;
+import fr.excilys.cdb.database.Pageable;
 import fr.excilys.cdb.model.Company;
+import fr.excilys.cdb.services.LoggerInstance;
 
 public class View {
 	
@@ -21,7 +23,7 @@ public class View {
 	final private String CASE_NEXT = "2";
 	
 	public final static int UPDATE_MANUFACTURER_NAME = 1;
-	public final static int UPDATE_COMPANY_NAME = 2;
+	public final static int UPDATE_COMPUTER_NAME = 2;
 	public final static int UPDATE_INTRODUCED_DATE = 3;
 	public final static int UPDATE_DISCONTINUED_DATE = 4;
 	
@@ -30,7 +32,10 @@ public class View {
 	private ControllerCompany controllerCompany;
 	private ControllerComputer controllerComputer;
 	
+	LoggerInstance loggerInstance = LoggerInstance.getLoggerInstance();
+	
 	public View() {
+		
 	}
 
 	public void client() throws ParseException{
@@ -47,40 +52,62 @@ public class View {
 					+ "\n " + DELETE_COMPUTER + " : Delete a computer"
 					+ "\n Other : Exit");
 			choice = scanner.next();
-			continueBoolean = getChoiceFunction(choice);
-			
+			continueBoolean = getChoiceFunction(choice);			
 			
 		}
 		
 	}
 	
-	public boolean getChoiceFunction(String choice) throws ParseException{
-		boolean result = true;
+	public boolean getChoiceFunction(String choice) {
 		switch(choice) {
-			case LIST_COMPUTERS: listComputers(); break;
-			case LIST_COMPANIES: listCompanies(); break;
-			case SHOW_SPECIFIC_COMPUTER: controllerComputer.showComputerDetails(); break;
-			case CERATE_COMPUTER: controllerComputer.createComputer(); break;
-			case UPDATE_COMPUTER: controllerComputer.updateComputer(); break;
-			case DELETE_COMPUTER: controllerComputer.deleteComputer(); break;
-			default: result = false; System.out.println("bye");
+			case LIST_COMPUTERS: try {
+				listComputers();
+			} catch (SQLException e) {
+				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.emptyBase.getMessage());
+				 
+			}finally {return true;}
+			case LIST_COMPANIES: try {
+				listCompanies();
+			} catch (SQLException e) {
+				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.emptyBase.getMessage());
+			}finally {return true;}
+			case SHOW_SPECIFIC_COMPUTER: try {
+				controllerComputer.showComputerDetails();
+			} catch (SQLException e) {
+				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.wrongIDFormat.getMessage());
+			}finally {return true;}
+			case CERATE_COMPUTER: try {
+				controllerComputer.createComputer();
+			} catch (ParseException e) {
+				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.wrongDateFormat.getMessage());
+			}finally {return true;}
+			case UPDATE_COMPUTER: try {
+				controllerComputer.updateComputer();
+			} catch (ParseException e) {
+				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.wrongDateFormat.getMessage());
+			} catch (SQLException e) {
+				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.nonExistentID.getMessage());
+			}finally {return true;}
+			case DELETE_COMPUTER: controllerComputer.deleteComputer(); return true;
+			default: System.out.println("bye");return false;
 		
 		}
-		return result;
 	}
 	
-	public void listComputers() {
+	public void listComputers() throws SQLException {
 		boolean exit = true;
 		Pageable pageable = new Pageable();
+		scanner.nextLine();
 		do {
 			controllerComputer.listComputersPageable(pageable);
 			exit = pageableHandler(pageable);
 		}while(exit);
 	}
 	
-	public void listCompanies() {
+	public void listCompanies() throws SQLException {
 		boolean exit = true;
 		Pageable pageable = new Pageable();
+		scanner.nextLine();
 		do {
 			controllerCompany.listCompaniesPageable(pageable.getOffset(),pageable.getLimit());
 			exit = pageableHandler(pageable);
@@ -90,7 +117,7 @@ public class View {
 	private boolean pageableHandler(Pageable pageable) {
 		boolean exit;
 		navigatePreviousNext();
-		String choice = scanner.next();
+		String choice = scanner.nextLine();
 		switch(choice) {
 		case CASE_PREVIOUS: pageable.previous();exit = true;break;
 		case CASE_NEXT: pageable.next();exit = true;break;
@@ -156,7 +183,17 @@ public class View {
 
 	public int getComputerId() {
 		System.out.println("Which computer id ?");
-		return scanner.nextInt();
+		return scannerNextInt();
+	}
+
+	private int scannerNextInt() {
+		try{
+			return scanner.nextInt();
+		}
+		catch(Exception e) {
+			 loggerInstance.expectLoop(LoggerInstance.MessageForScanner.wrongIDFormat.getMessage());
+			 return 0;
+		}
 	}
 
 	public void enterUpdaterComputer() {
@@ -165,29 +202,32 @@ public class View {
 	}
 
 	public int getUpdateChoice() {
-		System.out.println("What do you want to update ? (" + UPDATE_MANUFACTURER_NAME + "," + UPDATE_MANUFACTURER_NAME + "," + UPDATE_INTRODUCED_DATE + ", + UPDATE_DISCONTINUED_DATE + )");
-		return scanner.nextInt();
+		System.out.println("What do you want to update ? (" + UPDATE_MANUFACTURER_NAME + "," + UPDATE_COMPUTER_NAME + "," + UPDATE_INTRODUCED_DATE + "," + UPDATE_DISCONTINUED_DATE + ")");
+		return scannerNextInt();
 	}
 
 	public String askNewManufacturer() {
-
 		System.out.println("new manufacturer name : ");
-		return scanner.next();
+		scanner.nextLine();
+		return scanner.nextLine();
 	}
 
-	public String askNewCompanyName() {
+	public String askNewComputerName() {
 		System.out.println("new computer name : ");
-		return scanner.next();
+		scanner.nextLine();
+		return scanner.nextLine();
 	}
 
 	public String askNewIntroducedDate() {
 		System.out.println("new introduced date (dd/mm/yyyy) : ");
-		return scanner.next();
+		scanner.nextLine();
+		return scanner.nextLine();
 	}
 
 	public String askNewDiscontinuedDate() {
 		System.out.println("new discontinued date (dd/mm/yyyy) : ");
-		return scanner.next();
+		scanner.nextLine();
+		return scanner.nextLine();
 	}
 
 	public void enterDeleteComputer() {
@@ -196,7 +236,7 @@ public class View {
 
 	public int askComputerId() {
 		System.out.println("Which computer id ?");
-		return scanner.nextInt();
+		return scannerNextInt();
 	}
 
 }

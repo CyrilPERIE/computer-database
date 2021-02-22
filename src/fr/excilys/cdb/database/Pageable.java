@@ -1,4 +1,4 @@
-package database;
+package fr.excilys.cdb.database;
 
 public class Pageable {
 	private int offset = 0;
