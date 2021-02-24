@@ -58,40 +58,43 @@ public class View {
 		
 	}
 	
+	@SuppressWarnings("finally")
 	public boolean getChoiceFunction(String choice) {
+		boolean result = true;
 		switch(choice) {
 			case LIST_COMPUTERS: try {
 				listComputers();
 			} catch (SQLException e) {
 				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.emptyBase.getMessage());
 				 
-			}finally {return true;}
+			}finally {break;}
 			case LIST_COMPANIES: try {
 				listCompanies();
 			} catch (SQLException e) {
 				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.emptyBase.getMessage());
-			}finally {return true;}
+			}finally {break;}
 			case SHOW_SPECIFIC_COMPUTER: try {
 				controllerComputer.showComputerDetails();
 			} catch (SQLException e) {
 				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.wrongIDFormat.getMessage());
-			}finally {return true;}
+			}finally {break;}
 			case CERATE_COMPUTER: try {
 				controllerComputer.createComputer();
 			} catch (ParseException e) {
 				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.wrongDateFormat.getMessage());
-			}finally {return true;}
+			}finally {break;}
 			case UPDATE_COMPUTER: try {
 				controllerComputer.updateComputer();
 			} catch (ParseException e) {
 				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.wrongDateFormat.getMessage());
 			} catch (SQLException e) {
 				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.nonExistentID.getMessage());
-			}finally {return true;}
-			case DELETE_COMPUTER: controllerComputer.deleteComputer(); return true;
-			default: System.out.println("bye");return false;
+			}finally {break;}
+			case DELETE_COMPUTER: controllerComputer.deleteComputer(); break;
+			default: System.out.println("bye");result =  false;
 		
 		}
+		return result;
 	}
 	
 	public void listComputers() throws SQLException {

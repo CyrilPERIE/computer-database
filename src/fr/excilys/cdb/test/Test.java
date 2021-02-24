@@ -1,12 +1,30 @@
 package fr.excilys.cdb.test;
 
 import junit.framework.TestCase;
-import main.Main;
 
 public class Test extends TestCase {
 	
-	public void testCalcul() throws Exception {
-		assertEquals(2,Main.calcul(1,1));
+	public void testInsertWithExistingCompany() {
+		
+	}
+	
+	public void testInsertWithoutExistingCompany() {
+		
+	}
+	
+	public void testUpdate() {
+		
+	}
+	
+	public void testListCompanies() {
+		
+	}
+	
+	public void testListComputers() {
+		
 	}
 
+	public void testShowSpecificComputer() {
+		
+	}
 }
