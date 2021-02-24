@@ -77,18 +77,18 @@
                 </thead>
                 <!-- Browse attribute computers -->
                 <tbody id="results">
-				<c:forEach items="${computers}" var="computer">
+				<c:forEach items="${companies}" var="company">
                     
                     <tr>
                         <td class="editMode">
                             <input type="checkbox" name="cb" class="cb" value="0">
                         </td>
                         <td>
-                            <a href="editComputer.html" onclick="">${computer.name}</a>
+                            <a href="editComputer.html" onclick="">${company.name}</a>
                         </td>
-                        <td>${computer.name}</td>
-                        <td>${computer.name}</td>
-                        <td>${computer.name}</td>
+                        <td>${company.name}</td>
+                        <td>${company.name}</td>
+                        <td>${company.name}</td>
 
 					</tr>
 					

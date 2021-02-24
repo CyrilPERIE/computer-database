@@ -41,7 +41,7 @@ public class ControllerCompany {
 	 */
 
 	public void listCompaniesPageable(Pageable pageable) throws SQLException {
-		List<Company> companies = serviceCompany.listComputersPageable(pageable);
+		List<Company> companies = serviceCompany.listCompaniesPageable(pageable);
 		for(Company company : companies) {
 			view.printCompany(company);
 		}

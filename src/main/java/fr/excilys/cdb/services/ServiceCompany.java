@@ -33,7 +33,7 @@ public class ServiceCompany {
 		return daoCompany.listCompanies();
 	}
 
-	public List<Company> listComputersPageable(Pageable pageable) throws SQLException {
+	public List<Company> listCompaniesPageable(Pageable pageable) throws SQLException {
 		return daoCompany.listCompaniesPageable(pageable);
 	}
 

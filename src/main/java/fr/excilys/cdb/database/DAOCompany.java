@@ -119,8 +119,8 @@ public class DAOCompany {
 	public List<Company> listCompaniesPageable(Pageable pageable) {
 		String request = "SELECT * FROM company limit ? offset ?";
 		List<Company> companies = new ArrayList<Company>();
-		try(Connection connection = connectionHandler.openConnection()){
-			PreparedStatement preparedStatement = connection.prepareStatement(request);
+		try(Connection connection = connectionHandler.openConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(request)){
 			preparedStatement.setInt(1, pageable.getLimit());
 			preparedStatement.setInt(2, pageable.getOffset());
 			ResultSet resultSet = preparedStatement.executeQuery();
