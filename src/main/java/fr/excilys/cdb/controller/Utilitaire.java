@@ -13,5 +13,17 @@ public class Utilitaire {
 	     return sql;
         
 	}
+
+	public static java.sql.Date stringToDateWebUI(String date) {
+		 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+	     Date parsed = null;
+		try {
+			parsed = format.parse(date);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	     java.sql.Date sql = new java.sql.Date(parsed.getTime());
+	     return sql;
+	}
 	
 }

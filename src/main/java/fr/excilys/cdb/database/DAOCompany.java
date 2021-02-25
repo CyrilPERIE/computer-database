@@ -11,8 +11,9 @@ import java.util.List;
 import fr.excilys.cdb.model.Company;
 
 public class DAOCompany {
-
-	private static final String SELECT_ALL_PAGEABLE = "SELECT * FROM company limit ? offset ?";
+	
+	private static final String SELECT_ALL_NAME = "SELECT id, name FROM company";
+	private static final String SELECT_ALL_PAGEABLE = "SELECT id, name FROM company limit ? offset ?";
 	private static final String SELECT_ID = "SELECT id FROM company WHERE name = ?";
 	private static DAOCompany daoCompany;
 	private ConnectionHandler connectionHandler;
@@ -117,7 +118,21 @@ public class DAOCompany {
 			return getIdCompany(companyName);
 		}
 	}
+	
+	public List<Company> listCompanies() {
+		String request = SELECT_ALL_NAME;
+		List<Company> companies = new ArrayList<Company>();
+		try (Connection connection = connectionHandler.openConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
+			ResultSet resultSet = preparedStatement.executeQuery();
+			companies = resultSetToList(resultSet);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return companies;
 
+	}
+	
 	public List<Company> listCompaniesPageable(Pageable pageable) {
 		String request = SELECT_ALL_PAGEABLE;
 		List<Company> companies = new ArrayList<Company>();

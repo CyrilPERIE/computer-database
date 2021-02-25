@@ -29,11 +29,20 @@ public class ServiceCompany {
 		return serviceCompany;
 	}
 
+	public List<Company> listCompanies() throws SQLException {
+		return daoCompany.listCompanies();
+	}
+	
 	public List<Company> listCompaniesPageable(Pageable pageable) throws SQLException {
 		return daoCompany.listCompaniesPageable(pageable);
 	}
 
-	public int getIDCompany(String companyName) throws SQLException {
-		return daoCompany.getIdCompany(companyName);
+	public int getIDCompany(String companyName) {
+		try {
+			return daoCompany.getIdCompany(companyName);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return 0;
+		}
 	}
 }
