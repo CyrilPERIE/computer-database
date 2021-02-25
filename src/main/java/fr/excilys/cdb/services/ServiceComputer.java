@@ -36,10 +36,6 @@ public class ServiceComputer {
 	 * | 		From Controller to DAO			|
 	 * ------------------------------------------
 	 */
-	
-	public List<Computer> listComputers() throws SQLException {
-		return daoComputer.listComputers();
-	}
 
 	public List<Computer> listComputersPageable(Pageable pageable) throws SQLException {
 		return daoComputer.listComputersPageable(pageable);

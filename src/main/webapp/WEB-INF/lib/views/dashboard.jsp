@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<anyxmlelement xmlns:c="http://java.sun.com/jsp/jstl/core" />
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> 
 <html>
 <head>
 <title>Computer Database</title>
@@ -73,22 +73,21 @@
                             Company
                         </th>
 
-                    </tr>
-                </thead>
+                    </tr>           
                 <!-- Browse attribute computers -->
                 <tbody id="results">
-				<c:forEach items="${companies}" var="company">
+				<c:forEach items="${computers}" var="computer">
                     
                     <tr>
                         <td class="editMode">
                             <input type="checkbox" name="cb" class="cb" value="0">
                         </td>
                         <td>
-                            <a href="editComputer.html" onclick="">${company.name}</a>
+                            <a href="editComputer.html" onclick="">${computer.name}</a>
                         </td>
-                        <td>${company.name}</td>
-                        <td>${company.name}</td>
-                        <td>${company.name}</td>
+                        <td>${computer.introducedDate}</td>
+                        <td>${computer.discontinuedDate}</td>
+                        <td>${computer.manufacturer.name}</td>
 
 					</tr>
 					
@@ -106,11 +105,11 @@
                       <span aria-hidden="true">&laquo;</span>
                   </a>
               </li>
-              <li><a href="#">1</a></li>
-              <li><a href="#">2</a></li>
-              <li><a href="#">3</a></li>
-              <li><a href="#">4</a></li>
-              <li><a href="#">5</a></li>
+              <li><a href="1">1</a></li>
+              <li><a href="2">2</a></li>
+              <li><a href="3">3</a></li>
+              <li><a href="4">4</a></li>
+              <li><a href="5">5</a></li>
               <li>
                 <a href="#" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>

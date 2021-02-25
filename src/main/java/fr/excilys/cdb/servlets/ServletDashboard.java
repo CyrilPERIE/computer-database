@@ -11,8 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import fr.excilys.cdb.database.Pageable;
+import fr.excilys.cdb.model.Computer;
 import fr.excilys.cdb.model.Company;
-import fr.excilys.cdb.services.ServiceCompany;
+import fr.excilys.cdb.services.ServiceComputer;
 
 //@WebServlet("/Test")
 public class ServletDashboard extends HttpServlet {
@@ -23,20 +24,19 @@ public class ServletDashboard extends HttpServlet {
     }
 
     public void doGet( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException{
-    	ServiceCompany serviceCompany = ServiceCompany.getServiceCompanyInstance();
-    	List<Company> companies = new ArrayList<Company>();
+    	ServiceComputer serviceComputer = ServiceComputer.getServiceComputerInstance();
+    	List<Computer> computers = new ArrayList<Computer>();
     	Pageable pageable = new Pageable();
 		try {
-			companies = serviceCompany.listCompaniesPageable(pageable);
+			computers = serviceComputer.listComputersPageable(pageable);
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
-    	request.setAttribute("companies", companies);
+    	request.setAttribute("computers", computers);
     	this.getServletContext().getRequestDispatcher( "/WEB-INF/lib/views/dashboard.jsp" ).forward( request, response );
     }
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

@@ -29,10 +29,6 @@ public class ServiceCompany {
 		return serviceCompany;
 	}
 
-	public List<Company> listCompanies() throws SQLException {
-		return daoCompany.listCompanies();
-	}
-
 	public List<Company> listCompaniesPageable(Pageable pageable) throws SQLException {
 		return daoCompany.listCompaniesPageable(pageable);
 	}

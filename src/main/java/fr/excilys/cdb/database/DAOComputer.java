@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 import fr.excilys.cdb.model.Company;
@@ -86,54 +86,52 @@ public class DAOComputer {
 		}
 		return computer;
 	}
-		
+	
+	private List<Computer> resultSetToList(ResultSet resultSet) throws SQLException {
+		List<Computer> computers = new ArrayList<Computer>();
+		while(resultSet.next()) {
+			computers.add(resultSetToComputerObject(resultSet));
+		}
+		return computers;
+	}
+	
 	/*
 	 * ------------------------------------------
 	 * |               Query FCs                |
 	 * ------------------------------------------
 	 */
 	
-	public List<Computer> listComputers() throws SQLException {
-		String request = "SELECT *"
-				+ " FROM computer"
-				+ " JOIN company ON company.id = computer.company_id";
-		ResultSet resultSet = query(request);
-		List<Computer> computers = new ArrayList<Computer>();
-		while(resultSet.next()) {
-			computers.add(resultSetToComputerObject(resultSet));
-		}
-		return computers;
-	}
-	
 	public List<Computer> listComputersPageable(Pageable pageable) throws SQLException {
-		Connection connection = connectionHandler.openConnection();
 		String request = "SELECT * FROM computer JOIN company ON company.id = computer.company_id limit ? offset ?";
-		try {
-			PreparedStatement preparedStatement = connection.prepareStatement(request);
+		List<Computer> computers = new ArrayList<Computer>();
+		try(Connection connection = connectionHandler.openConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(request)){
 			preparedStatement.setInt(1, pageable.getLimit());
 			preparedStatement.setInt(2, pageable.getOffset());
+			ResultSet resultSet = preparedStatement.executeQuery();
+			computers = resultSetToList(resultSet);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} 
-		ResultSet resultSet = query(request);
-		List<Computer> computers = new ArrayList<Computer>();
-		while(resultSet.next()) {
-			computers.add(resultSetToComputerObject(resultSet));
-		}
 		return computers;
+		
 	}
 
 	public List<Computer> showComputerDetails(int computerId) throws SQLException {
 		String request = "SELECT *"
 				+ " FROM computer"
 				+ " JOIN company ON company.id = computer.company_id"
-				+ " WHERE computer.id = " + computerId;
+				+ " WHERE computer.id = ? ";
 
-		ResultSet resultSet = query(request);
 		List<Computer> computers = new ArrayList<Computer>();
-		while(resultSet.next()) {
-			computers.add(resultSetToComputerObject(resultSet));
-		}
+		try(Connection connection = connectionHandler.openConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(request)){
+			preparedStatement.setInt(1, computerId);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			computers = resultSetToList(resultSet);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} 
 		return computers;
 	}
 	
@@ -149,8 +147,17 @@ public class DAOComputer {
 	}
 	
 	public void createComputer(int companyId, String computerName, Date introducedDate, Date discontinuedDate) {
-		String request = "INSERT INTO computer VALUES (null, '" + computerName + "', '" + introducedDate + "' , '" + discontinuedDate + "' , '" + companyId + "' )";
-		execute(request);
+		String request = "INSERT INTO computer VALUES (null, ?, ?, ?, ? )";
+		try(Connection connection = connectionHandler.openConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(request)){
+			preparedStatement.setString(1, computerName);
+			preparedStatement.setDate(2, introducedDate!= null ? introducedDate : null);
+			preparedStatement.setDate(3, discontinuedDate!= null ? discontinuedDate : null);
+			preparedStatement.setInt(4, companyId);
+			preparedStatement.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} 
 		
 	}
 

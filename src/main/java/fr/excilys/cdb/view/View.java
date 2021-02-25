@@ -15,7 +15,7 @@ public class View {
 	final private String LIST_COMPUTERS = "1";
 	final private String LIST_COMPANIES = "2";
 	final private String SHOW_SPECIFIC_COMPUTER = "3";
-	final private String CERATE_COMPUTER = "4";
+	final private String CREATE_COMPUTER = "4";
 	final private String UPDATE_COMPUTER = "5";
 	final private String DELETE_COMPUTER = "6";
 	
@@ -69,7 +69,7 @@ public class View {
 					+ "\n " + LIST_COMPUTERS + " : List computers"
 					+ "\n " + LIST_COMPANIES + " : List companies"
 					+ "\n " + SHOW_SPECIFIC_COMPUTER + " : Show computer details"
-					+ "\n " + CERATE_COMPUTER + " : Create a computer"
+					+ "\n " + CREATE_COMPUTER + " : Create a computer"
 					+ "\n " + UPDATE_COMPUTER + " : Update a computer"
 					+ "\n " + DELETE_COMPUTER + " : Delete a computer"
 					+ "\n Other : Exit");
@@ -99,8 +99,9 @@ public class View {
 				controllerComputer.showComputerDetails();
 			} catch (SQLException e) {
 				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.wrongIDFormat.getMessage());
+				e.printStackTrace();
 			}finally {break;}
-			case CERATE_COMPUTER: try {
+			case CREATE_COMPUTER: try {
 				controllerComputer.createComputer();
 			} catch (ParseException e) {
 				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.wrongDateFormat.getMessage());
@@ -175,6 +176,7 @@ public class View {
 
 	public String getComputerName() {
 		System.out.println("Name of the computer (press ENTER key if you don't have the name) : ");
+		scanner.nextLine();
 		return scanner.nextLine();
 	}
 

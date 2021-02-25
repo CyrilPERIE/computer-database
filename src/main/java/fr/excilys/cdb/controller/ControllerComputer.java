@@ -46,13 +46,6 @@ public class ControllerComputer {
 	 * ------------------------------------------
 	 */
 
-	public void listComputers() throws SQLException {
-		List<Computer> computers = serviceComputer.listComputers();
-		for(Computer computer : computers) {
-			computerToString(computer);
-			}
-	}
-
 	public void listComputersPageable(Pageable pageable) throws SQLException {
 		List<Computer> computers = serviceComputer.listComputersPageable(pageable);
 		for(Computer computer : computers) {
@@ -77,12 +70,14 @@ public class ControllerComputer {
 	 */
 
 	public void createComputer() throws ParseException, SQLException {
+		System.out.println("jentre dans create computer controller");
 		view.enterInsertComputer();
+		System.out.println("je sors de enterInsertComputer");
 		String computerName = view.getComputerName();
 		String companyName = view.getCompanyName();
 		String introducedDate = view.getIntroducedDate();
 		String discontinuedDate = view.getDiscontinuedDate();
-
+		System.out.println("fin des saisies");
 		int companyId = controllerCompany.getIdCompany(companyName);
 
 		serviceComputer.createComputer(companyId, computerName, Utilitaire.stringToDate(introducedDate),
