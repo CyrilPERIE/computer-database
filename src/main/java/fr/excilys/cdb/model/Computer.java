@@ -3,18 +3,18 @@ package fr.excilys.cdb.model;
 import java.sql.Date;
 import java.time.LocalDate;
 
-public class Computer {	
-	
+public class Computer {
+
 	/*
-	 * ------------------------------------------
-	 * |             BUILDER PATTERN            |
+	 * ------------------------------------------ 
+	 * | 			BUILDER PATTERN 			|
 	 * ------------------------------------------
 	 */
 
 	public static class ComputerBuilder {
 
 		private int id;
-		private Company manufacturer;
+		private Company company;
 		private String name;
 		private LocalDate introducedDate;
 		private LocalDate discontinuedDate;
@@ -30,7 +30,7 @@ public class Computer {
 		}
 
 		public ComputerBuilder computerManufacturer(Company manufacturer) {
-			this.manufacturer = manufacturer;
+			this.company = manufacturer;
 
 			return this;
 		}
@@ -44,8 +44,7 @@ public class Computer {
 		public ComputerBuilder computerIntroducedDate(Date introducedDate) {
 			try {
 				this.introducedDate = introducedDate.toLocalDate();
-			}
-			catch(Exception e) {
+			} catch (Exception e) {
 				this.introducedDate = null;
 			}
 			return this;
@@ -55,8 +54,7 @@ public class Computer {
 		public ComputerBuilder computerDiscontinuedDate(Date discontinuedDate) {
 			try {
 				this.discontinuedDate = discontinuedDate.toLocalDate();
-			}
-			catch(Exception e) {
+			} catch (Exception e) {
 				this.discontinuedDate = null;
 			}
 			return this;
@@ -65,7 +63,7 @@ public class Computer {
 		public Computer build() {
 			Computer computerTestBuilder = new Computer();
 			computerTestBuilder.id = this.id;
-			computerTestBuilder.manufacturer = this.manufacturer;
+			computerTestBuilder.manufacturer = this.company;
 			computerTestBuilder.name = this.name;
 			computerTestBuilder.introducedDate = this.introducedDate;
 			computerTestBuilder.discontinuedDate = this.discontinuedDate;
@@ -73,55 +71,59 @@ public class Computer {
 		}
 
 	}
-	
+
 	/*
-	 * ------------------------------------------
-	 * |             CONSTRUCTOR & FCs          |
+	 * ------------------------------------------ 
+	 * | 			CONSTRUCTOR & FCs 			|
 	 * ------------------------------------------
 	 */
-	
+
 	private int id;
 	private Company manufacturer;
 	private String name;
 	private LocalDate introducedDate;
-	private LocalDate discontinuedDate;	
-	
+	private LocalDate discontinuedDate;
+
 	private Computer() {
-		
+
 	}
-	
+
 	public String toString() {
-		if(this.discontinuedDate == null) {
-			return id + " | " + this.name + " has been manufacturing by " + manufacturer.getName() + " and has been introduced in " + this.dateToString(this.getIntroducedDate()) + ", it's still on the market";
+		if (this.discontinuedDate == null) {
+			return id + " | " + this.name + " has been manufacturing by " + manufacturer.getName()
+					+ " and has been introduced in " + this.dateToString(this.getIntroducedDate())
+					+ ", it's still on the market";
 		}
-		return id + " | " + this.name + " has been manufacturing by " + manufacturer.getName() + " and has been introduced in " + this.dateToString(this.getIntroducedDate()) + " and discontinued in " + this.dateToString(this.getDiscontinuedDate());
+		return id + " | " + this.name + " has been manufacturing by " + manufacturer.getName()
+				+ " and has been introduced in " + this.dateToString(this.getIntroducedDate()) + " and discontinued in "
+				+ this.dateToString(this.getDiscontinuedDate());
 	}
 
 	private String dateToString(LocalDate date) {
 		try {
-			String[] months = {"January","February","March","April","May","June","July","August","September","October","November","December"};
-			return date.getDayOfWeek() + " of " + months[date.getMonthValue()-1] + " " + date.getYear();
-		}
-		catch(Exception e) {
+			String[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September",
+					"October", "November", "December" };
+			return date.getDayOfWeek() + " of " + months[date.getMonthValue() - 1] + " " + date.getYear();
+		} catch (Exception e) {
 			return "NO DATE";
 		}
-		
+
 	}
-	
+
 	public void listElements() {
 		System.out.println("1 manufacturer : " + manufacturer.getName());
 		System.out.println("2 computer name : " + name);
 		System.out.println("3 introducedDate : " + introducedDate);
 		System.out.println("4 discontinuedDate : " + discontinuedDate);
-		
+
 	}
-	
+
 	/*
-	 * ------------------------------------------
-	 * |             SETTER & GETTER            |
+	 * ------------------------------------------ 
+	 * | 			SETTER & GETTER 			|
 	 * ------------------------------------------
 	 */
-	
+
 	public int getId() {
 		return id;
 	}

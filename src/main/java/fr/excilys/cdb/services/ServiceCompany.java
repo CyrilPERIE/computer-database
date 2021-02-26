@@ -37,12 +37,7 @@ public class ServiceCompany {
 		return daoCompany.listCompaniesPageable(pageable);
 	}
 
-	public int getIDCompany(String companyName) {
-		try {
-			return daoCompany.getIdCompany(companyName);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return 0;
-		}
+	public int getIDCompany(String companyName) throws SQLException {
+		return daoCompany.getIdCompany(companyName);
 	}
 }

@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import fr.excilys.cdb.controller.Utilitaire;
-import fr.excilys.cdb.database.Pageable;
 import fr.excilys.cdb.model.Company;
 import fr.excilys.cdb.services.ServiceCompany;
 import fr.excilys.cdb.services.ServiceComputer;
@@ -41,15 +40,17 @@ public class ServletAddComputer extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
 		String computerName = request.getParameter("computerName");
-		Date indtroducedDate = Utilitaire.stringToDateWebUI(request.getParameter("introducedDate"));
-		Date discontinuedDate = Utilitaire.stringToDateWebUI(request.getParameter("discontinuedDate"));
-		
-
-		ServiceCompany serviceCompany = ServiceCompany.getServiceCompanyInstance();
-		String companyName = request.getParameter("companyName");
-		int companyId = serviceCompany.getIDCompany(companyName);
+		Date indtroducedDate = null, discontinuedDate = null;
+		try {
+			indtroducedDate = Utilitaire.stringToDate(request.getParameter("introducedDate"));
+			discontinuedDate = Utilitaire.stringToDate(request.getParameter("discontinuedDate"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		int companyId = Integer.valueOf(request.getParameter("companyName"));
 		
 		ServiceComputer serviceComputer = ServiceComputer.getServiceComputerInstance();
+		
 		serviceComputer.createComputer(companyId, computerName, indtroducedDate, discontinuedDate);
 		
 	}

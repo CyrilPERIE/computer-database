@@ -74,6 +74,10 @@ public class ServiceComputer {
 		daoComputer.deleteComputer(computerId);
 		
 	}
+
+	public int totalNumberComputer() {
+		return daoComputer.totalNumberComputer();
+	}
 	
 	/*
 	 * ------------------------------------------ 

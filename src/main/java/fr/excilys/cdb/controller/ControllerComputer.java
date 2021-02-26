@@ -135,4 +135,8 @@ public class ControllerComputer {
 		System.out.println(computer.toString());
 	}
 
+	public int totalNumberComputer() {
+		return serviceComputer.totalNumberComputer();
+	}
+
 }

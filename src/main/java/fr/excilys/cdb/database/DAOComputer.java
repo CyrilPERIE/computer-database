@@ -102,7 +102,10 @@ public class DAOComputer {
 	 */
 	
 	public List<Computer> listComputersPageable(Pageable pageable) throws SQLException {
-		String request = "SELECT * FROM computer JOIN company ON company.id = computer.company_id limit ? offset ?";
+		String request = "SELECT * "
+				+ "FROM computer "
+				+ "LEFT JOIN company ON company.id = computer.company_id "
+				+ "limit ? offset ?";
 		List<Computer> computers = new ArrayList<Computer>();
 		try(Connection connection = connectionHandler.openConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)){
@@ -133,6 +136,25 @@ public class DAOComputer {
 			e.printStackTrace();
 		} 
 		return computers;
+	}
+	
+
+
+	public int totalNumberComputer() {
+		String request = "SELECT "
+				+ " COUNT(id)"
+				+ " FROM computer";
+		int result = 0;
+		try(Connection connection = connectionHandler.openConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(request)){
+			ResultSet resultSet = preparedStatement.executeQuery();
+			resultSet.next();
+			result = resultSet.getInt("COUNT(id)");
+		} catch (SQLException e) {
+			e.printStackTrace();
+} 
+			
+		return result;
 	}
 	
 	/*

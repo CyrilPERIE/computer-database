@@ -14,14 +14,9 @@ public class Utilitaire {
         
 	}
 
-	public static java.sql.Date stringToDateWebUI(String date) {
+	public static java.sql.Date stringToDateWebUI(String date) throws ParseException {
 		 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-	     Date parsed = null;
-		try {
-			parsed = format.parse(date);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+	     Date parsed = format.parse(date);
 	     java.sql.Date sql = new java.sql.Date(parsed.getTime());
 	     return sql;
 	}

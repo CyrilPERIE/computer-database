@@ -31,6 +31,7 @@ public class View {
 	private Scanner scanner = new Scanner(System.in);
 	private ControllerCompany controllerCompany;
 	private ControllerComputer controllerComputer;
+	private int totalNumberComputer;
 	
 	private static View view;
 	
@@ -39,6 +40,7 @@ public class View {
 	private View() {
 		this.controllerComputer = ControllerComputer.getControllerComputerInstance();
 		this.controllerCompany = ControllerCompany.getControllerCompanyInstance();
+		this.totalNumberComputer = controllerComputer.totalNumberComputer();
 	}
 
 	/*
@@ -128,7 +130,7 @@ public class View {
 	
 	public void listComputers() throws SQLException {
 		boolean exit = true;
-		Pageable pageable = new Pageable();
+		Pageable pageable = new Pageable(totalNumberComputer);
 		scanner.nextLine();
 		do {
 			controllerComputer.listComputersPageable(pageable);
@@ -138,7 +140,7 @@ public class View {
 	
 	public void listCompanies() throws SQLException {
 		boolean exit = true;
-		Pageable pageable = new Pageable();
+		Pageable pageable = new Pageable(totalNumberComputer);
 		scanner.nextLine();
 		do {
 			controllerCompany.listCompaniesPageable(pageable);
