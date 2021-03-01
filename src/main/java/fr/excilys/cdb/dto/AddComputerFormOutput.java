@@ -1,63 +1,58 @@
 package fr.excilys.cdb.dto;
 
-public class DTOAddComputerForm {
+public class AddComputerFormOutput {
 	private String computerName;
 	private String introducedDate;
 	private String discontinuedDate;
 	private String companyId;
 
 
-	private DTOAddComputerForm(DTOAddComputerFormBuilder dtoAddComputerFormBuilder) {
-		this.computerName = dtoAddComputerFormBuilder.computerName;
-		this.introducedDate = dtoAddComputerFormBuilder.introducedDate;
-		this.discontinuedDate = dtoAddComputerFormBuilder.discontinuedDate;
-		this.companyId = dtoAddComputerFormBuilder.companyId;
+	private AddComputerFormOutput(AddComputerFormOutputBuilder addComputerFormOutputBuilder) {
+		this.computerName = addComputerFormOutputBuilder.computerName;
+		this.introducedDate = addComputerFormOutputBuilder.introducedDate;
+		this.discontinuedDate = addComputerFormOutputBuilder.discontinuedDate;
+		this.companyId = addComputerFormOutputBuilder.companyId;
 	}
-
+	
 	/*
 	 * ------------------------------------------
 	 * |          		BUILDER 	            |
 	 * ------------------------------------------
 	 */
 	
-	public static DTOAddComputerFormBuilder builder() {
-		return new DTOAddComputerFormBuilder();
-	}
-	
-	public static final class DTOAddComputerFormBuilder {
+	public static final class AddComputerFormOutputBuilder {
 		private String computerName;
 		private String introducedDate;
 		private String discontinuedDate;
 		private String companyId;
 
-		private DTOAddComputerFormBuilder() {
+		public AddComputerFormOutputBuilder() {
 		}
 
-		public DTOAddComputerFormBuilder withComputerName(String computerName) {
+		public AddComputerFormOutputBuilder withComputerName(String computerName) {
 			this.computerName = computerName;
 			return this;
 		}
 
-		public DTOAddComputerFormBuilder withIntroducedDate(String introducedDate) {
-			this.introducedDate = introducedDate;
+		public AddComputerFormOutputBuilder withIntroducedDate(String introducedDate) {
+			this.introducedDate = introducedDate;	
 			return this;
 		}
 
-		public DTOAddComputerFormBuilder withDiscontinuedDate(String discontinuedDate) {
-			this.discontinuedDate = discontinuedDate;
+		public AddComputerFormOutputBuilder withDiscontinuedDate(String discontinuedDate) {
+			this.discontinuedDate = discontinuedDate;			
 			return this;
 		}
 
-		public DTOAddComputerFormBuilder withCompanyId(String companyId) {
+		public AddComputerFormOutputBuilder withCompanyId(String companyId) {
 			this.companyId = companyId;
 			return this;
 		}
 
-		public DTOAddComputerForm build() {
-			return new DTOAddComputerForm(this);
+		public AddComputerFormOutput build() {
+			return new AddComputerFormOutput(this);
 		}
 	}
-	
 	
 	/*
 	 * ------------------------------------------
@@ -90,8 +85,8 @@ public class DTOAddComputerForm {
 		this.companyId = companyId;
 	}
 	
-	
-	
-	
+	public String toString() {
+		return "computer name " + computerName + " | introduced date " + introducedDate + " | discontinued date " + discontinuedDate + " | company id " + companyId;
+	}
 	
 }

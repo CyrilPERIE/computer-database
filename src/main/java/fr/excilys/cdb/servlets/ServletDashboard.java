@@ -31,46 +31,21 @@ public class ServletDashboard extends HttpServlet {
 		pageable.setMax(totalNumberOfComputer);
 		checkAnyEvent(request);
 
-		List<Integer> indexPage = sendPageIndexes();
+		List<Integer> indexPage = pageable.sendPageIndexes();
 		request.setAttribute("indexPage", indexPage);
 
 		List<Computer> computers = sendComputers();
 		request.setAttribute("computers", computers);
+		
+		int currentPage = 1;
+		request.setAttribute("currentPage", currentPage);
 
 		String totalNumberComputer = String.valueOf(totalNumberOfComputer);
 		request.setAttribute("numberOfComputers", totalNumberComputer);
 		this.getServletContext().getRequestDispatcher("/WEB-INF/lib/views/dashboard.jsp").forward(request, response);
 	}
 
-	private List<Integer> sendPageIndexes() {
-		List<Integer> result = new ArrayList<Integer>();
 
-		int count = 1, pageableOffset = pageable.getOffset(), pageableLimit = pageable.getLimit(),
-				pageableMax = pageable.getMax(),
-				numberOfIndexWeWant = (pageableMax / pageableLimit > 6 ? 5 : pageableMax / pageableLimit),
-				maxIndex = pageableMax / pageableLimit, minIndex = 0, middleIndex = pageableOffset / pageableLimit;
-		result.add(middleIndex);
-		
-		boolean sup = true;
-		while (count < numberOfIndexWeWant) {
-			
-			if (sup && Collections.min(result) - 1 >= minIndex) {
-				result.add(Collections.min(result) - 1);
-				count++;
-				sup = !sup;
-			} else if (!sup && Collections.max(result) + 1 <= maxIndex) {
-				result.add(Collections.max(result) + 1);
-				count++;
-				sup = !sup;
-			}
-			else {
-				sup = !sup;
-			}
-		}
-
-		Collections.sort(result);
-		return result;
-	}
 
 	private void checkAnyEvent(HttpServletRequest request) {
 		if (request.getParameter("go") != null) {

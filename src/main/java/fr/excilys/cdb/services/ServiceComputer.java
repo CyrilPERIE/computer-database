@@ -6,6 +6,7 @@ import java.util.List;
 
 import fr.excilys.cdb.database.DAOComputer;
 import fr.excilys.cdb.database.Pageable;
+import fr.excilys.cdb.exception.CustomSQLException;
 import fr.excilys.cdb.model.Computer;
 
 public class ServiceComputer {
@@ -45,8 +46,8 @@ public class ServiceComputer {
 		return daoComputer.showComputerDetails(computerId);
 	}
 
-	public void createComputer(int companyId, String computerName, Date introducedDate, Date discontinuedDate) {
-		daoComputer.createComputer(companyId, computerName, introducedDate, discontinuedDate);
+	public void createComputer(Computer computer) throws CustomSQLException {
+		daoComputer.createComputer(computer);
 		
 	}
 

@@ -37,7 +37,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="companyId">Company</label>
-                                <select name="companyName" class="form-control" id="companyId" >
+                                <select name="companyId" class="form-control" id="companyId" >
                                     <c:forEach items="${companies}" var="company">
                                     	<option value="${company.id}"><c:out value="${company.name}"/></option>
                                     </c:forEach>

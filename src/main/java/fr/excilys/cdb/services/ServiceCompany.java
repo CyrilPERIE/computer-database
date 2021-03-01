@@ -5,6 +5,7 @@ import java.util.List;
 
 import fr.excilys.cdb.database.DAOCompany;
 import fr.excilys.cdb.database.Pageable;
+import fr.excilys.cdb.exception.CustomSQLException;
 import fr.excilys.cdb.model.Company;
 
 public class ServiceCompany {
@@ -29,7 +30,7 @@ public class ServiceCompany {
 		return serviceCompany;
 	}
 
-	public List<Company> listCompanies() throws SQLException {
+	public List<Company> listCompanies() throws SQLException, CustomSQLException {
 		return daoCompany.listCompanies();
 	}
 	
@@ -37,7 +38,7 @@ public class ServiceCompany {
 		return daoCompany.listCompaniesPageable(pageable);
 	}
 
-	public int getIDCompany(String companyName) throws SQLException {
+	public int getIDCompany(String companyName) throws SQLException, CustomSQLException {
 		return daoCompany.getIdCompany(companyName);
 	}
 }

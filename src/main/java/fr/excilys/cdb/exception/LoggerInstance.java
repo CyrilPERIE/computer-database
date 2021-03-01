@@ -1,16 +1,15 @@
-package fr.excilys.cdb.services;
+package fr.excilys.cdb.exception;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoggerInstance {
 	
-	private static Logger logger;
+	private static final Logger logger = LoggerFactory.getLogger(LoggerInstance.class);;
 	private static LoggerInstance loggerInstance;
 	
 	private LoggerInstance() {
-		PropertyConfigurator.configure("log4j.properties");
-		logger = Logger.getLogger(LoggerInstance.class);
+		
 	}
 	
 	public void expectLoop(String message) {
@@ -24,30 +23,18 @@ public class LoggerInstance {
 		return loggerInstance;
 	}
 	
-	public enum TypeForScanner {
-		
-	    INT("integer"), STRING("string");
-		
-		private String type;
-		
-		private TypeForScanner(String type) {
-			this.type = type;
-		}
-		
-		public String getType() {
-			return this.type;
-		}
-	}
-	
-	public enum MessageForScanner {
+	public enum Messages {
 		wrongDateFormat("Wrong date format ! Follow the date format"), 
 		wrongIDFormat("Type a valid ID format (TIP: it must be a number)"), 
 		nonExistentID("This ID doesn't exist, try another one or refer to the list of computers !"), 
-		emptyBase("This base is empty");
+		emptyBase("This base is empty"),
+		emptyComputerNameField("This computer name field is empty"), 
+		connectionFailed("Connection failed"), 
+		noCompanyFound("No company found !");
 		
 		private String message;
 		
-		private MessageForScanner(String message) {
+		private Messages(String message) {
 			this.message = message;
 		}
 		
@@ -55,6 +42,10 @@ public class LoggerInstance {
 			return this.message;
 		}
 		
+	}
+
+	public Logger getLogger() {
+		return logger;
 	}
 	
 }

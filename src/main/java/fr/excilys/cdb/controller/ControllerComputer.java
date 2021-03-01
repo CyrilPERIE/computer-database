@@ -5,8 +5,8 @@ import java.text.ParseException;
 import java.util.List;
 
 import fr.excilys.cdb.database.Pageable;
+import fr.excilys.cdb.exception.LoggerInstance;
 import fr.excilys.cdb.model.Computer;
-import fr.excilys.cdb.services.LoggerInstance;
 import fr.excilys.cdb.services.ServiceComputer;
 import fr.excilys.cdb.view.View;
 

@@ -16,7 +16,7 @@ public class Company {
 			
 		}
 		
-		public CompanyBuilder computerId(int id) {
+		public CompanyBuilder companyId(int id) {
 			this.id = id;
 			return this;
 		}

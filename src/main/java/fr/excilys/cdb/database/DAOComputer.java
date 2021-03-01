@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.sql.Date;
 import java.util.List;
 
+import fr.excilys.cdb.controller.Utilitaire;
+import fr.excilys.cdb.exception.CustomSQLException;
 import fr.excilys.cdb.model.Company;
 import fr.excilys.cdb.model.Company.CompanyBuilder;
 import fr.excilys.cdb.model.Computer;
@@ -73,7 +75,7 @@ public class DAOComputer {
 	public Computer resultSetToComputerObject(ResultSet resultSet) throws SQLException {
 		Computer computer = null;
 		try {
-			Company company = new CompanyBuilder().computerId(resultSet.getInt("computer.id"))
+			Company company = new CompanyBuilder().companyId(resultSet.getInt("computer.id"))
 					.computerName(resultSet.getString("company.name")).build();
 	
 			computer = new ComputerBuilder().computerId(resultSet.getInt("computer.id"))
@@ -168,17 +170,17 @@ public class DAOComputer {
 		execute(request);
 	}
 	
-	public void createComputer(int companyId, String computerName, Date introducedDate, Date discontinuedDate) {
+	public void createComputer(Computer computer) throws CustomSQLException {
 		String request = "INSERT INTO computer VALUES (null, ?, ?, ?, ? )";
 		try(Connection connection = connectionHandler.openConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)){
-			preparedStatement.setString(1, computerName);
-			preparedStatement.setDate(2, introducedDate!= null ? introducedDate : null);
-			preparedStatement.setDate(3, discontinuedDate!= null ? discontinuedDate : null);
-			preparedStatement.setInt(4, companyId);
+			preparedStatement.setString(1, computer.getName());
+			preparedStatement.setDate(2, computer.getIntroducedDate()!= null ? Utilitaire.LocalDateToDate(computer.getIntroducedDate()) : null);
+			preparedStatement.setDate(3, computer.getDiscontinuedDate()!= null ? Utilitaire.LocalDateToDate(computer.getDiscontinuedDate()) : null);
+			preparedStatement.setInt(4, computer.getManufacturer().getId());
 			preparedStatement.execute();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new CustomSQLException();
 		} 
 		
 	}

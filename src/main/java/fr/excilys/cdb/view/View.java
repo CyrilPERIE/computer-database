@@ -7,8 +7,8 @@ import java.util.Scanner;
 import fr.excilys.cdb.controller.ControllerCompany;
 import fr.excilys.cdb.controller.ControllerComputer;
 import fr.excilys.cdb.database.Pageable;
+import fr.excilys.cdb.exception.LoggerInstance;
 import fr.excilys.cdb.model.Company;
-import fr.excilys.cdb.services.LoggerInstance;
 
 public class View {
 	
@@ -89,31 +89,31 @@ public class View {
 			case LIST_COMPUTERS: try {
 				listComputers();
 			} catch (SQLException e) {
-				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.emptyBase.getMessage());
+				loggerInstance.expectLoop(LoggerInstance.Messages.emptyBase.getMessage());
 				 
 			}finally {break;}
 			case LIST_COMPANIES: try {
 				listCompanies();
 			} catch (SQLException e) {
-				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.emptyBase.getMessage());
+				loggerInstance.expectLoop(LoggerInstance.Messages.emptyBase.getMessage());
 			}finally {break;}
 			case SHOW_SPECIFIC_COMPUTER: try {
 				controllerComputer.showComputerDetails();
 			} catch (SQLException e) {
-				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.wrongIDFormat.getMessage());
+				loggerInstance.expectLoop(LoggerInstance.Messages.wrongIDFormat.getMessage());
 				e.printStackTrace();
 			}finally {break;}
 			case CREATE_COMPUTER: try {
 				controllerComputer.createComputer();
 			} catch (ParseException e) {
-				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.wrongDateFormat.getMessage());
+				loggerInstance.expectLoop(LoggerInstance.Messages.wrongDateFormat.getMessage());
 			}finally {break;}
 			case UPDATE_COMPUTER: try {
 				controllerComputer.updateComputer();
 			} catch (ParseException e) {
-				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.wrongDateFormat.getMessage());
+				loggerInstance.expectLoop(LoggerInstance.Messages.wrongDateFormat.getMessage());
 			} catch (SQLException e) {
-				loggerInstance.expectLoop(LoggerInstance.MessageForScanner.nonExistentID.getMessage());
+				loggerInstance.expectLoop(LoggerInstance.Messages.nonExistentID.getMessage());
 			}finally {break;}
 			case DELETE_COMPUTER: controllerComputer.deleteComputer(); break;
 			default: System.out.println("bye");result =  false;
@@ -232,7 +232,7 @@ public class View {
 			return scanner.nextInt();
 		}
 		catch(Exception e) {
-			 loggerInstance.expectLoop(LoggerInstance.MessageForScanner.wrongIDFormat.getMessage());
+			 loggerInstance.expectLoop(LoggerInstance.Messages.wrongIDFormat.getMessage());
 			 return 0;
 		}
 	}

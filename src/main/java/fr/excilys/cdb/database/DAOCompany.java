@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.excilys.cdb.exception.CustomSQLException;
 import fr.excilys.cdb.model.Company;
 
 public class DAOCompany {
@@ -42,7 +43,7 @@ public class DAOCompany {
 	private Company resultSetToCompanyObject(ResultSet resultSet) throws SQLException {
 		Company company = null;
 		try {
-			company = new Company.CompanyBuilder().computerId(resultSet.getInt("id"))
+			company = new Company.CompanyBuilder().companyId(resultSet.getInt("id"))
 					.computerName(resultSet.getString("name")).build();
 
 		} catch (SQLException e) {
@@ -104,7 +105,7 @@ public class DAOCompany {
 	 * ------------------------------------------
 	 */
 
-	public int getIdCompany(String companyName) throws SQLException {
+	public int getIdCompany(String companyName) throws SQLException, CustomSQLException {
 		String request = SELECT_ID;
 		try (Connection connection = connectionHandler.openConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
@@ -119,7 +120,7 @@ public class DAOCompany {
 		}
 	}
 	
-	public List<Company> listCompanies() {
+	public List<Company> listCompanies() throws CustomSQLException {
 		String request = SELECT_ALL_NAME;
 		List<Company> companies = new ArrayList<Company>();
 		try (Connection connection = connectionHandler.openConnection();
@@ -127,7 +128,7 @@ public class DAOCompany {
 			ResultSet resultSet = preparedStatement.executeQuery();
 			companies = resultSetToList(resultSet);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new CustomSQLException();
 		}
 		return companies;
 
@@ -154,14 +155,14 @@ public class DAOCompany {
 	 * ------------------------------------------
 	 */
 
-	public void createCompany(String companyName) {
+	public void createCompany(String companyName) throws CustomSQLException {
 		String request = "INSERT INTO company VALUES (null, ?)";
 		try (Connection connection = connectionHandler.openConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setString(1, companyName);
 			preparedStatement.execute();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new CustomSQLException();
 		}
 	}
 
