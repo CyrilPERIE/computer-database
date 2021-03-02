@@ -26,14 +26,17 @@
                             <div class="form-group">
                                 <label for="computerName">Computer name</label>
                                 <input type="text" name ="computerName" class="form-control" id="computerName" placeholder="Computer name">
+                                <span class = "error">${errorsForRequest["computerNameField"]}</span>
                             </div>
                             <div class="form-group">
                                 <label for="introduced">Introduced date</label>
                                 <input type="date" name="introducedDate" class="form-control" id="introduced" placeholder="Introduced date">
+                                <span class = "error">${errorsForRequest["dateField"]}</span>
                             </div>
                             <div class="form-group">
                                 <label for="discontinued">Discontinued date</label>
                                 <input type="date" name="discontinuedDate" class="form-control" id="discontinued" placeholder="Discontinued date">
+                                <span class = "error">${errorsForRequest["dateField"]}</span>
                             </div>
                             <div class="form-group">
                                 <label for="companyId">Company</label>
@@ -42,9 +45,11 @@
                                     	<option value="${company.id}"><c:out value="${company.name}"/></option>
                                     </c:forEach>
                                 </select>
+                                <span class = "error">${errorsForRequest["companyNameField"]}</span>
                             </div>                  
                         </fieldset>
                         <div class="actions pull-right">
+                        	<span class = "error">${errorsForRequest["global"]}</span>
                             <input type="submit" name = "addComputer" value="Add" class="btn btn-primary">
                             or
                             <a href="/cdb/dashboard" class="btn btn-default">Cancel</a>

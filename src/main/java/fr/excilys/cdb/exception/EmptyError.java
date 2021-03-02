@@ -17,7 +17,8 @@ public class EmptyError extends Exception {
 		super(msg);
 	}
 	
-	public void emptyComputerName() {
+	public String emptyComputerName() {
 		logger.info(LoggerInstance.Messages.emptyComputerNameField.getMessage());
+		return LoggerInstance.Messages.emptyComputerNameField.getMessage();
 	}
 }

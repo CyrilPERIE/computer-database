@@ -1,10 +1,10 @@
 package fr.excilys.cdb.servlets;
 
 import java.io.IOException;
-import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import fr.excilys.cdb.dto.AddComputerFormOutput;
 import fr.excilys.cdb.dto.mapper.DTOComputerMapper;
 import fr.excilys.cdb.dto.validator.ValidatorAddComputer;
+import fr.excilys.cdb.exception.CustomDateException;
 import fr.excilys.cdb.exception.CustomSQLException;
 import fr.excilys.cdb.exception.EmptyError;
 import fr.excilys.cdb.exception.ParseError;
@@ -25,6 +26,7 @@ import fr.excilys.cdb.services.ServiceComputer;
 //@WebServlet("/Test")
 public class ServletAddComputer extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	Map<String, String> errors = new HashMap<>();
 
 	public ServletAddComputer() {
 
@@ -35,18 +37,22 @@ public class ServletAddComputer extends HttpServlet {
 		List<Company> companies = new ArrayList<Company>();
 		try {
 			companies = serviceCompany.listCompanies();
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
 		} catch (CustomSQLException customSQLException) {
-			customSQLException.noDataDetected();
+			errors.put("global", customSQLException.noDataDetected());
+		} catch (ClassNotFoundException e) {
+			errors.put("global", "can't connect to database");
 		}
+		
 		request.setAttribute("companies", companies);
+		
+		Map<String, String> errorsForRequest = new HashMap<>(errors);
+		errors.clear();
+		request.setAttribute("errorsForRequest", errorsForRequest);
 		this.getServletContext().getRequestDispatcher("/WEB-INF/lib/views/addComputer.jsp").forward(request, response);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		doGet(request, response);
 		String computerName = request.getParameter("computerName"),
 				introducedDate = request.getParameter("introducedDate"),
 				discontinuedDate = request.getParameter("discontinuedDate"),
@@ -55,17 +61,26 @@ public class ServletAddComputer extends HttpServlet {
 				.withComputerName(computerName).withDiscontinuedDate(discontinuedDate)
 				.withIntroducedDate(introducedDate).withCompanyId(companyId).build();
 
+		validateUserEntries(addComputerFormOutput);
+		doGet(request, response);
+	}
+
+	private void validateUserEntries(AddComputerFormOutput addComputerFormOutput) {
 		try {
 			ValidatorAddComputer.validate(addComputerFormOutput);
-			ServiceComputer serviceComputer = ServiceComputer.getServiceComputerInstance();
+			ServiceComputer serviceComputer = ServiceComputer.getInstance();
 			Computer computer = DTOComputerMapper.AddComputerFormOutputToComputer(addComputerFormOutput);
 			serviceComputer.createComputer(computer);
 		} catch (ParseError parseError) {
-			parseError.parseErrorDetected();
+			errors.put("dateField",parseError.parseErrorDetected());
 		} catch (EmptyError emptyError) {
-			emptyError.emptyComputerName();
+			errors.put("computerNameField",emptyError.emptyComputerName());
 		} catch (CustomSQLException customSQLException) {
 			customSQLException.connectionLostDetected();
+		} catch (ClassNotFoundException e) {
+			errors.put("global", "can't connect to database");
+		} catch (CustomDateException customDateException) {
+			errors.put("dateField", customDateException.notAfter());
 		}
 	}
 

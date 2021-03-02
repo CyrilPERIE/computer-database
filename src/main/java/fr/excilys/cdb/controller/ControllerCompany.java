@@ -27,7 +27,7 @@ public class ControllerCompany {
 	 * ------------------------------------------
 	 */
 
-	public static ControllerCompany getControllerCompanyInstance() {
+	public static ControllerCompany getInstance() {
 		if (controllerCompany == null) {
 			controllerCompany = new ControllerCompany();
 		}

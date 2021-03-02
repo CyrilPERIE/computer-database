@@ -30,7 +30,8 @@ public class LoggerInstance {
 		emptyBase("This base is empty"),
 		emptyComputerNameField("This computer name field is empty"), 
 		connectionFailed("Connection failed"), 
-		noCompanyFound("No company found !");
+		noCompanyFound("No company found !"), 
+		notAfter("Discontinued date must be after introduced Date");
 		
 		private String message;
 		

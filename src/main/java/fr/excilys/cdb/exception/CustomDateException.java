@@ -3,22 +3,22 @@ package fr.excilys.cdb.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ParseError extends Exception {
+public class CustomDateException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LoggerFactory.getLogger(EmptyError.class);
 	LoggerInstance loggerInstance = LoggerInstance.getLoggerInstance();
 
-	public ParseError() {
+	public CustomDateException() {
 		super();
 	}
 
-	public ParseError(String msg) {
+	public CustomDateException(String msg) {
 		super(msg);
 	}
 	
-	public String parseErrorDetected() {
-		logger.info(LoggerInstance.Messages.wrongDateFormat.getMessage());
-		return LoggerInstance.Messages.wrongDateFormat.getMessage();
+	public String notAfter() {
+		logger.info(LoggerInstance.Messages.notAfter.getMessage());
+		return LoggerInstance.Messages.notAfter.getMessage();
 	}
 }

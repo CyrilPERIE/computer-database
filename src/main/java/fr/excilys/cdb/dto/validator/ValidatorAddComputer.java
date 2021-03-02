@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 
 import fr.excilys.cdb.controller.Utilitaire;
 import fr.excilys.cdb.dto.AddComputerFormOutput;
+import fr.excilys.cdb.exception.CustomDateException;
 import fr.excilys.cdb.exception.EmptyError;
 import fr.excilys.cdb.exception.ParseError;
 
@@ -17,7 +18,7 @@ public class ValidatorAddComputer {
 	 * ------------------------------------------
 	 */
 	
-	public static void validate(AddComputerFormOutput addComputerFormOutput) throws ParseError, EmptyError {
+	public static void validate(AddComputerFormOutput addComputerFormOutput) throws ParseError, EmptyError, CustomDateException {
 		validateComputerName(addComputerFormOutput.getComputerName());
 		validateDiscontinuedDateAfterIntroducedDate(addComputerFormOutput.getIntroducedDate(), addComputerFormOutput.getDiscontinuedDate());
 	}
@@ -49,7 +50,7 @@ public class ValidatorAddComputer {
 		return false;
 	}
 	
-	private static boolean validateDiscontinuedDateAfterIntroducedDate(String introducedDate, String discontinuedDate) throws ParseError {
+	private static boolean validateDiscontinuedDateAfterIntroducedDate(String introducedDate, String discontinuedDate) throws ParseError, CustomDateException {
 		if(validateDiscontinuedDate(discontinuedDate) && validateIntroducedDate(introducedDate)) {
 			Date discontinuedDateDate;
 			Date introducedDateDate;
@@ -62,6 +63,9 @@ public class ValidatorAddComputer {
 			
 			if(discontinuedDateDate.getTime() >= introducedDateDate.getTime()) {
 				return true;
+			}
+			else {
+				throw new CustomDateException();
 			}
 		}
 		return false;

@@ -27,3 +27,8 @@ input[type='checkbox'] {
     border-radius: 5px;
     white-space: nowrap;
 }
+
+.error {
+	color: red;
+	font-style: italic;
+}

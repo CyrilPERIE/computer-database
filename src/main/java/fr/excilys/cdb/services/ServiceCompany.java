@@ -14,7 +14,7 @@ public class ServiceCompany {
 	private DAOCompany daoCompany;
 
 	private ServiceCompany() {
-		this.daoCompany = DAOCompany.getDAOCompanyInstance();
+		this.daoCompany = DAOCompany.getInstance();
 	}
 
 	/*
@@ -30,15 +30,15 @@ public class ServiceCompany {
 		return serviceCompany;
 	}
 
-	public List<Company> listCompanies() throws SQLException, CustomSQLException {
+	public List<Company> listCompanies() throws CustomSQLException, ClassNotFoundException {
 		return daoCompany.listCompanies();
 	}
 	
-	public List<Company> listCompaniesPageable(Pageable pageable) throws SQLException {
+	public List<Company> listCompaniesPageable(Pageable pageable) throws SQLException, ClassNotFoundException, CustomSQLException {
 		return daoCompany.listCompaniesPageable(pageable);
 	}
 
-	public int getIDCompany(String companyName) throws SQLException, CustomSQLException {
+	public int getIDCompany(String companyName) throws SQLException, CustomSQLException, ClassNotFoundException {
 		return daoCompany.getIdCompany(companyName);
 	}
 }

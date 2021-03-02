@@ -38,8 +38,8 @@ public class View {
 	LoggerInstance loggerInstance = LoggerInstance.getLoggerInstance();
 
 	private View() {
-		this.controllerComputer = ControllerComputer.getControllerComputerInstance();
-		this.controllerCompany = ControllerCompany.getControllerCompanyInstance();
+		this.controllerComputer = ControllerComputer.getInstance();
+		this.controllerCompany = ControllerCompany.getInstance();
 		this.totalNumberComputer = controllerComputer.totalNumberComputer();
 	}
 

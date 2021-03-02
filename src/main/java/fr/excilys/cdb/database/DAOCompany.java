@@ -20,7 +20,7 @@ public class DAOCompany {
 	private ConnectionHandler connectionHandler;
 
 	private DAOCompany() {
-		this.connectionHandler = ConnectionHandler.getConnectionInstance();
+		this.connectionHandler = ConnectionHandler.getInstance();
 	}
 
 	/*
@@ -28,7 +28,7 @@ public class DAOCompany {
 	 * ------------------------------------------
 	 */
 
-	public static DAOCompany getDAOCompanyInstance() {
+	public static DAOCompany getInstance() {
 		if (daoCompany == null) {
 			daoCompany = new DAOCompany();
 		}
@@ -65,7 +65,7 @@ public class DAOCompany {
 	 * ------------------------------------------
 	 */
 
-	public List<Company> query(String request) {
+	public List<Company> query(String request) throws ClassNotFoundException {
 		List<Company> companies = new ArrayList<Company>();
 		try (Connection connection = connectionHandler.openConnection()) {
 			Statement statement = connection.createStatement();
@@ -78,25 +78,24 @@ public class DAOCompany {
 		return companies;
 	}
 
-	public List<Company> queryPreparedStatement(PreparedStatement preparedStatement) {
+	public List<Company> queryPreparedStatement(PreparedStatement preparedStatement) throws ClassNotFoundException, CustomSQLException {
 		List<Company> companies = new ArrayList<Company>();
 		try (Connection connection = connectionHandler.openConnection()) {
 			ResultSet resultSet = preparedStatement.executeQuery();
 			companies = resultSetToList(resultSet);
 		} catch (SQLException exception) {
-
-			exception.printStackTrace();
+			throw new CustomSQLException();
 		}
 		return companies;
 	}
 
-	public void execute(String query) {
+	public void execute(String query) throws ClassNotFoundException, CustomSQLException {
 		Statement statement;
 		try (Connection connection = connectionHandler.openConnection()) {
 			statement = connection.createStatement();
 			statement.executeUpdate(query);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new CustomSQLException();
 		}
 	}
 
@@ -105,7 +104,7 @@ public class DAOCompany {
 	 * ------------------------------------------
 	 */
 
-	public int getIdCompany(String companyName) throws SQLException, CustomSQLException {
+	public int getIdCompany(String companyName) throws SQLException, CustomSQLException, ClassNotFoundException {
 		String request = SELECT_ID;
 		try (Connection connection = connectionHandler.openConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
@@ -120,7 +119,7 @@ public class DAOCompany {
 		}
 	}
 	
-	public List<Company> listCompanies() throws CustomSQLException {
+	public List<Company> listCompanies() throws CustomSQLException, ClassNotFoundException {
 		String request = SELECT_ALL_NAME;
 		List<Company> companies = new ArrayList<Company>();
 		try (Connection connection = connectionHandler.openConnection();
@@ -134,7 +133,7 @@ public class DAOCompany {
 
 	}
 	
-	public List<Company> listCompaniesPageable(Pageable pageable) {
+	public List<Company> listCompaniesPageable(Pageable pageable) throws CustomSQLException, ClassNotFoundException {
 		String request = SELECT_ALL_PAGEABLE;
 		List<Company> companies = new ArrayList<Company>();
 		try (Connection connection = connectionHandler.openConnection();
@@ -144,7 +143,7 @@ public class DAOCompany {
 			ResultSet resultSet = preparedStatement.executeQuery();
 			companies = resultSetToList(resultSet);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new CustomSQLException();
 		}
 		return companies;
 
@@ -155,7 +154,7 @@ public class DAOCompany {
 	 * ------------------------------------------
 	 */
 
-	public void createCompany(String companyName) throws CustomSQLException {
+	public void createCompany(String companyName) throws CustomSQLException, ClassNotFoundException {
 		String request = "INSERT INTO company VALUES (null, ?)";
 		try (Connection connection = connectionHandler.openConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {

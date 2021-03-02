@@ -15,13 +15,8 @@ public class ConnectionHandler {
 	private ConnectionHandler() {
 	}
 	
-	public Connection openConnection() throws SQLException {
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public Connection openConnection() throws SQLException, ClassNotFoundException {
+		Class.forName("com.mysql.cj.jdbc.Driver");
 		return DriverManager.getConnection(url, username, password);
 	}
 	/*
@@ -30,7 +25,7 @@ public class ConnectionHandler {
 	 * ------------------------------------------
 	 */
 	
-	public static ConnectionHandler getConnectionInstance() {
+	public static ConnectionHandler getInstance() {
 		if (connectionHandler == null) {
 			connectionHandler = new ConnectionHandler();
 		}

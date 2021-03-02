@@ -20,8 +20,8 @@ public class ControllerComputer {
 	private static ControllerComputer controllerComputer;
 
 	private ControllerComputer() {
-		this.serviceComputer = ServiceComputer.getServiceComputerInstance();
-		this.controllerCompany = ControllerCompany.getControllerCompanyInstance();
+		this.serviceComputer = ServiceComputer.getInstance();
+		this.controllerCompany = ControllerCompany.getInstance();
 	}
 	
 	public static void setView() {
@@ -33,7 +33,7 @@ public class ControllerComputer {
 	 * ------------------------------------------
 	 */
 
-	public static ControllerComputer getControllerComputerInstance() {
+	public static ControllerComputer getInstance() {
 		if (controllerComputer == null) {
 			controllerComputer = new ControllerComputer();
 		}

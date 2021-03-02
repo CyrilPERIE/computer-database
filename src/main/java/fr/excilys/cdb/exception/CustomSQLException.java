@@ -17,19 +17,19 @@ public class CustomSQLException extends Exception {
 		super(msg);
 	}
 	
-	public void noContentDectect() {
+	public String noContentDectect() {
 		logger.info(LoggerInstance.Messages.wrongDateFormat.getMessage());
-		
-		Exception e = new Exception();
-		e.printStackTrace();
+		return LoggerInstance.Messages.wrongDateFormat.getMessage();
 	
 	}
 
-	public void connectionLostDetected() {
-		logger.info(LoggerInstance.Messages.connectionFailed.getMessage());		
+	public String connectionLostDetected() {
+		logger.info(LoggerInstance.Messages.connectionFailed.getMessage());
+		return LoggerInstance.Messages.connectionFailed.getMessage();
 	}
 
-	public void noDataDetected() {
-		logger.info(LoggerInstance.Messages.noCompanyFound.getMessage());		
+	public String noDataDetected() {
+		logger.info(LoggerInstance.Messages.noCompanyFound.getMessage());
+		return LoggerInstance.Messages.noCompanyFound.getMessage();
 	}
 }
