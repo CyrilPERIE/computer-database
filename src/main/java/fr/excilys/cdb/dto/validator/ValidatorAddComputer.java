@@ -19,7 +19,7 @@ public class ValidatorAddComputer {
 	 */
 	
 	public static void validate(AddComputerFormOutput addComputerFormOutput) throws ParseError, EmptyError, CustomDateException {
-		validateComputerName(addComputerFormOutput.getComputerName());
+		//validateComputerName(addComputerFormOutput.getComputerName());
 		validateDiscontinuedDateAfterIntroducedDate(addComputerFormOutput.getIntroducedDate(), addComputerFormOutput.getDiscontinuedDate());
 	}
 	

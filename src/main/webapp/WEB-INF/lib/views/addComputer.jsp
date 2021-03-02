@@ -8,6 +8,8 @@
 <style><%@include file="../css/bootstrap.min.css"%></style>
 <style><%@include file="../css/font-awesome.css"%></style>
 <style><%@include file="../css/main.css"%></style>
+
+<script><%@include file="../js/addComputer.js"%></script>
 </head>
 <body>
     <header class="navbar navbar-inverse navbar-fixed-top">
@@ -25,18 +27,17 @@
                         <fieldset>
                             <div class="form-group">
                                 <label for="computerName">Computer name</label>
-                                <input type="text" name ="computerName" class="form-control" id="computerName" placeholder="Computer name">
-                                <span class = "error">${errorsForRequest["computerNameField"]}</span>
+                                <input type="text" name ="computerName" class="form-control" id="computerName" placeholder="Computer name" required>
                             </div>
                             <div class="form-group">
                                 <label for="introduced">Introduced date</label>
-                                <input type="date" name="introducedDate" class="form-control" id="introduced" placeholder="Introduced date">
-                                <span class = "error">${errorsForRequest["dateField"]}</span>
+                                <input type="date" name="introducedDate" class="form-control" id="introduced" placeholder="Introduced date"
+                                onchange = limitMinDate(this.value) value ="">
                             </div>
                             <div class="form-group">
                                 <label for="discontinued">Discontinued date</label>
-                                <input type="date" name="discontinuedDate" class="form-control" id="discontinued" placeholder="Discontinued date">
-                                <span class = "error">${errorsForRequest["dateField"]}</span>
+                                <input type="date" name="discontinuedDate" class="form-control" id="discontinued" placeholder="Discontinued date" 
+                                onchange = limitMaxDate(this.value) value ="">
                             </div>
                             <div class="form-group">
                                 <label for="companyId">Company</label>
