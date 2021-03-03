@@ -21,10 +21,17 @@ public class Utilitaire {
 	     java.sql.Date sql = new java.sql.Date(parsed.getTime());
 	     return sql;
 	}
-
+	
 	public static java.sql.Date LocalDateToDate(LocalDate localDate) {
 		java.sql.Date date = java.sql.Date.valueOf(localDate);
 		return date;
+	}
+
+	public static String localDateToString(LocalDate localDate) {
+		if(localDate != null) {
+			return localDate.toString();
+		}
+		return null;
 	}
 	
 }

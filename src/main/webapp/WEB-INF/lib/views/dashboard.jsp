@@ -73,7 +73,8 @@
 						<tr>
 							<td class="editMode"><input type="checkbox" name="cb"
 								class="cb" value="0"></td>
-							<td><a href="editComputer.html" onclick="">${computer.name}</a>
+							<td><a href="<c:url value="editComputer">
+							<c:param name="id" value="${computer.id}"/></c:url>">${computer.name}</a>
 							</td>
 							<td>${computer.introducedDate}</td>
 							<td>${computer.discontinuedDate}</td>

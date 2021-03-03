@@ -16,6 +16,7 @@ public class DAOCompany {
 	private static final String SELECT_ALL_NAME = "SELECT id, name FROM company";
 	private static final String SELECT_ALL_PAGEABLE = "SELECT id, name FROM company limit ? offset ?";
 	private static final String SELECT_ID = "SELECT id FROM company WHERE name = ?";
+	private static final String INSERT_COMPUTER = "INSERT INTO company VALUES (null, ?)";
 	private static DAOCompany daoCompany;
 	private ConnectionHandler connectionHandler;
 
@@ -138,8 +139,8 @@ public class DAOCompany {
 		List<Company> companies = new ArrayList<Company>();
 		try (Connection connection = connectionHandler.openConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
-			preparedStatement.setInt(1, pageable.getLimit());
-			preparedStatement.setInt(2, pageable.getOffset());
+			preparedStatement.setInt(1, pageable.getLimitParameter());
+			preparedStatement.setInt(2, pageable.getOffsetParameter());
 			ResultSet resultSet = preparedStatement.executeQuery();
 			companies = resultSetToList(resultSet);
 		} catch (SQLException e) {
@@ -155,7 +156,7 @@ public class DAOCompany {
 	 */
 
 	public void createCompany(String companyName) throws CustomSQLException, ClassNotFoundException {
-		String request = "INSERT INTO company VALUES (null, ?)";
+		String request = INSERT_COMPUTER;
 		try (Connection connection = connectionHandler.openConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setString(1, companyName);

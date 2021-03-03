@@ -7,20 +7,21 @@ import java.text.SimpleDateFormat;
 
 import fr.excilys.cdb.controller.Utilitaire;
 import fr.excilys.cdb.dto.AddComputerFormOutput;
+import fr.excilys.cdb.dto.EditComputerFormInput;
 import fr.excilys.cdb.exception.CustomDateException;
 import fr.excilys.cdb.exception.EmptyError;
 import fr.excilys.cdb.exception.ParseError;
 
-public class ValidatorAddComputer {
+public class ValidatorEditComputer {
 	/*
 	 * ------------------------------------------ 
 	 * | 				Test Fcs				|
 	 * ------------------------------------------
 	 */
 	
-	public static void validate(AddComputerFormOutput addComputerFormOutput) throws ParseError, EmptyError, CustomDateException {
-		validateComputerName(addComputerFormOutput.getComputerName());
-		validateDiscontinuedDateAfterIntroducedDate(addComputerFormOutput.getIntroducedDate(), addComputerFormOutput.getDiscontinuedDate());
+	public static void validate(EditComputerFormInput editComputerFormInput) throws ParseError, EmptyError, CustomDateException {
+		validateComputerName(editComputerFormInput.getComputerName());
+		validateDiscontinuedDateAfterIntroducedDate(editComputerFormInput.getIntroducedDate(), editComputerFormInput.getDiscontinuedDate());
 	}
 	
 	private static void validateComputerName(String computerName) throws EmptyError {
@@ -39,29 +40,24 @@ public class ValidatorAddComputer {
 	            throw new ParseError();
 	        }
 		}
+		System.out.println("retourne faux pour validate date");
 		return false;
 	}
 	
-	private static boolean validateDiscontinuedDateAfterIntroducedDate(String introducedDate, String discontinuedDate) throws ParseError, CustomDateException {
+	private static void validateDiscontinuedDateAfterIntroducedDate(String introducedDate, String discontinuedDate) throws ParseError, CustomDateException {
 		if(validateDate(discontinuedDate) && validateDate(introducedDate)) {
 			Date discontinuedDateDate;
 			Date introducedDateDate;
 			try {
 				discontinuedDateDate = Utilitaire.stringToDateWebUI(discontinuedDate);
 				introducedDateDate = Utilitaire.stringToDateWebUI(introducedDate);
+				if(!(discontinuedDateDate.getTime() >= introducedDateDate.getTime())) throw new CustomDateException();
 			} catch (ParseException e) {
-				return false;
+				throw new ParseError();
 			}
 			
-			if(discontinuedDateDate.getTime() >= introducedDateDate.getTime()) {
-				return true;
-			}
-			else {
-				throw new CustomDateException();
-			}
 		}
-		return false;
+		System.out.println("retourne faux pour after");
 	}
 	
 }
-

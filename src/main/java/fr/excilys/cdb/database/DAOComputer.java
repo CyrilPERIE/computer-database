@@ -1,7 +1,6 @@
 package fr.excilys.cdb.database;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,36 +16,54 @@ import fr.excilys.cdb.model.Computer;
 import fr.excilys.cdb.model.Computer.ComputerBuilder;
 
 public class DAOComputer {
-	
+
+	private static final String UPDATE_COMPUTER = "UPDATE computer "
+			+ "SET name = ?, introduced = ?, discontinued = ?, company_id = ? "
+			+ "WHERE id = ?";
+	private static final String DELETE_COMPUTER = "DELETE FROM computer where id = ?";
+	private static final String INSERT_COMPUTER = "INSERT INTO computer VALUES (null, ?, ?, ?, ? )";
+	private static final String SELECT_ONE_COMPUTER = "SELECT computer.name, computer.introduced, computer.discontinued, computer.id, company.name"
+			+ " FROM computer"
+			+ " LEFT JOIN company ON company.id = computer.company_id" 
+			+ " WHERE computer.id = ? ";
+	private static final String COUNT_COMPUTERS = "SELECT COUNT(id) FROM computer";
+	private static final String SELECT_COMPUTERS_PAGEABLE = "SELECT computer.name, computer.introduced, computer.discontinued, computer.id, company.name "
+			+ "FROM computer " 
+			+ "LEFT JOIN company ON company.id = computer.company_id " 
+			+ "limit ? offset ?";
+	private static final String SELECT_COMPUTERS_LIKE = "SELECT computer.name, computer.introduced, computer.discontinued, computer.id, company.name"
+			+ " FROM computer"
+			+ " JOIN company ON company.id = computer.company_id" 
+			+ " WHERE computer.name LIKE ?";
 	private static DAOComputer daoComputer;
 	private ConnectionHandler connectionHandler;
-	
+
 	private DAOComputer() {
 		this.connectionHandler = ConnectionHandler.getInstance();
 	}
 
 	/*
-	 * ------------------------------------------
-	 * |               SINGLETON                |
+	 * ------------------------------------------ 
+	 * |				 SINGLETON 				|
 	 * ------------------------------------------
 	 */
-	
+
 	public static DAOComputer getInstance() {
-		if(daoComputer == null) {
+		if (daoComputer == null) {
 			daoComputer = new DAOComputer();
 		}
 		return daoComputer;
 	}
 
 	/*
-	 * ------------------------------------------
-	 * |            DIVE IN DB FCs              |
+	 * ------------------------------------------ 
+	 * |			 DIVE IN DB FCs 			|
 	 * ------------------------------------------
 	 */
-	
+
 	public ResultSet query(String query) throws ClassNotFoundException, CustomSQLException {
 		ResultSet resultSet = null;
-		try(Connection connection = connectionHandler.openConnection()) {
+		try (Connection connection = connectionHandler.openConnection()) {
 			Statement statement = connection.createStatement();
 			resultSet = statement.executeQuery(query);
 		} catch (SQLException exception) {
@@ -54,159 +71,174 @@ public class DAOComputer {
 		}
 		return resultSet;
 	}
-	
+
 	public void execute(String query) throws CustomSQLException, ClassNotFoundException {
 		Statement statement;
-		try(Connection connection = connectionHandler.openConnection()) {
+		try (Connection connection = connectionHandler.openConnection()) {
 			statement = connection.createStatement();
 			statement.executeUpdate(query);
 		} catch (SQLException e) {
 			throw new CustomSQLException();
 		}
 	}
-	
+
 	/*
-	 * ------------------------------------------
-	 * |       ResultSet Cleaning FCs           |
+	 * ------------------------------------------ 
+	 * | 			ResultSet Cleaning FCs 		|
 	 * ------------------------------------------
 	 */
-	
+
 	public Computer resultSetToComputerObject(ResultSet resultSet) throws SQLException {
 		Computer computer = null;
 		try {
 			Company company = new CompanyBuilder().companyId(resultSet.getInt("computer.id"))
 					.computerName(resultSet.getString("company.name")).build();
-	
-			computer = new ComputerBuilder().computerId(resultSet.getInt("computer.id"))
-					.computerManufacturer(company).computerName(resultSet.getString("computer.name"))
+
+			computer = new ComputerBuilder().computerId(resultSet.getInt("computer.id")).computerManufacturer(company)
+					.computerName(resultSet.getString("computer.name"))
 					.computerIntroducedDate(resultSet.getDate("computer.introduced"))
 					.computerDiscontinuedDate(resultSet.getDate("computer.discontinued")).build();
-	
+
 		} catch (SQLException e) {
 			throw e;
 		}
 		return computer;
 	}
-	
+
 	private List<Computer> resultSetToList(ResultSet resultSet) throws SQLException {
 		List<Computer> computers = new ArrayList<Computer>();
-		while(resultSet.next()) {
+		while (resultSet.next()) {
 			computers.add(resultSetToComputerObject(resultSet));
 		}
 		return computers;
 	}
-	
+
 	/*
-	 * ------------------------------------------
-	 * |               Query FCs                |
+	 * ------------------------------------------ 
+	 * | 				Query FCs 				|
 	 * ------------------------------------------
 	 */
-	
+
 	public List<Computer> listComputersPageable(Pageable pageable) throws ClassNotFoundException, CustomSQLException {
-		String request = "SELECT * "
-				+ "FROM computer "
-				+ "LEFT JOIN company ON company.id = computer.company_id "
-				+ "limit ? offset ?";
+		String request = SELECT_COMPUTERS_PAGEABLE;
 		List<Computer> computers = new ArrayList<Computer>();
-		try(Connection connection = connectionHandler.openConnection();
-		PreparedStatement preparedStatement = connection.prepareStatement(request)){
-			preparedStatement.setInt(1, pageable.getLimit());
-		preparedStatement.setInt(2, pageable.getOffset());
-		ResultSet resultSet = preparedStatement.executeQuery();
-		computers = resultSetToList(resultSet);
-		}catch(SQLException e) {
+		try (Connection connection = connectionHandler.openConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
+			preparedStatement.setInt(1, pageable.getLimitParameter());
+			preparedStatement.setInt(2, pageable.getOffsetParameter());
+			ResultSet resultSet = preparedStatement.executeQuery();
+			computers = resultSetToList(resultSet);
+		} catch (SQLException e) {
 			throw new CustomSQLException();
 		}
-		
+
 		return computers;
-		
+
+	}
+	
+	public List<Computer> selectComputersLike(String like) throws ClassNotFoundException, CustomSQLException {
+		String request = SELECT_COMPUTERS_LIKE;
+		List<Computer> computers = new ArrayList<Computer>();
+		try (Connection connection = connectionHandler.openConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
+			preparedStatement.setString(1, "%" + like + "%");
+			ResultSet resultSet = preparedStatement.executeQuery();
+			computers = resultSetToList(resultSet);
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			throw new CustomSQLException();
+		}
+
+		return computers;
+
 	}
 
-	public List<Computer> showComputerDetails(int computerId) throws SQLException, ClassNotFoundException, CustomSQLException {
-		String request = "SELECT *"
-				+ " FROM computer"
-				+ " JOIN company ON company.id = computer.company_id"
-				+ " WHERE computer.id = ? ";
+	public List<Computer> showComputerDetails(int computerId)
+			throws SQLException, ClassNotFoundException, CustomSQLException {
+		String request = SELECT_ONE_COMPUTER;
 
 		List<Computer> computers = new ArrayList<Computer>();
-		try(Connection connection = connectionHandler.openConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(request)){
+		try (Connection connection = connectionHandler.openConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setInt(1, computerId);
 			ResultSet resultSet = preparedStatement.executeQuery();
 			computers = resultSetToList(resultSet);
 		} catch (SQLException e) {
 			throw new CustomSQLException();
-		} 
+		}
 		return computers;
 	}
-	
-
 
 	public int totalNumberComputer() throws ClassNotFoundException, CustomSQLException {
-		String request = "SELECT "
-				+ " COUNT(id)"
-				+ " FROM computer";
+		String request = COUNT_COMPUTERS;
 		int result = 0;
-		try(Connection connection = connectionHandler.openConnection();
-			PreparedStatement preparedStatement = connection.prepareStatement(request)){
+		try (Connection connection = connectionHandler.openConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			ResultSet resultSet = preparedStatement.executeQuery();
 			resultSet.next();
 			result = resultSet.getInt("COUNT(id)");
 		} catch (SQLException e) {
 			throw new CustomSQLException();
-} 
-			
+		}
+
 		return result;
 	}
-	
+
 	/*
-	 * ------------------------------------------
-	 * |               Execute FCs              |
+	 * ------------------------------------------ 
+	 * | 				Execute FCs				|
 	 * ------------------------------------------
 	 */
-	
+
 	public void deleteComputer(int computerId) throws ClassNotFoundException, CustomSQLException {
-		String request = "DELETE FROM computer where id = " + computerId;
-		execute(request);
+		String request = DELETE_COMPUTER;
+		try (Connection connection = connectionHandler.openConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
+			preparedStatement.setInt(1, computerId);
+			preparedStatement.execute();
+		} catch (SQLException e) {
+			throw new CustomSQLException();
+		}
 	}
-	
+
 	public void createComputer(Computer computer) throws CustomSQLException, ClassNotFoundException {
-		String request = "INSERT INTO computer VALUES (null, ?, ?, ?, ? )";
-		try(Connection connection = connectionHandler.openConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(request)){
+		String request = INSERT_COMPUTER;
+		try (Connection connection = connectionHandler.openConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setString(1, computer.getName());
-			preparedStatement.setDate(2, computer.getIntroducedDate()!= null ? Utilitaire.LocalDateToDate(computer.getIntroducedDate()) : null);
-			preparedStatement.setDate(3, computer.getDiscontinuedDate()!= null ? Utilitaire.LocalDateToDate(computer.getDiscontinuedDate()) : null);
+			preparedStatement.setDate(2,
+					computer.getIntroducedDate() != null ? Utilitaire.LocalDateToDate(computer.getIntroducedDate())
+							: null);
+			preparedStatement.setDate(3,
+					computer.getDiscontinuedDate() != null ? Utilitaire.LocalDateToDate(computer.getDiscontinuedDate())
+							: null);
 			preparedStatement.setInt(4, computer.getManufacturer().getId());
 			preparedStatement.execute();
 		} catch (SQLException e) {
 			throw new CustomSQLException();
-		} 
-		
+		}
+
 	}
 
-	public void updateComputerName(String computerName, int computerId) throws ClassNotFoundException, CustomSQLException {
-		String request = "UPDATE computer SET name = '" + computerName + "' WHERE id = '" +  computerId + "'";
-		execute(request);
-		
+	public void updateComputer(Computer computer, int computerId) throws ClassNotFoundException, CustomSQLException {
+		String request = UPDATE_COMPUTER;
+		try (Connection connection = connectionHandler.openConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
+			preparedStatement.setString(1, computer.getName());
+			preparedStatement.setDate(2,
+					computer.getIntroducedDate() != null ? Utilitaire.LocalDateToDate(computer.getIntroducedDate())
+							: null);
+			preparedStatement.setDate(3,
+					computer.getDiscontinuedDate() != null ? Utilitaire.LocalDateToDate(computer.getDiscontinuedDate())
+							: null);
+			preparedStatement.setInt(4, computer.getManufacturer().getId());
+			preparedStatement.setInt(5, computerId);
+			preparedStatement.execute();
+		} catch (SQLException e) {
+			System.out.println("erreur");
+			throw new CustomSQLException();
+		}
+
 	}
 
-	public void updateIntroducedDate(Date introducedDate, int computerId) throws ClassNotFoundException, CustomSQLException {
-		String request = "UPDATE computer SET introduced = '" + introducedDate + "' WHERE id = '" +  computerId + "'";
-		execute(request);
-		
-	}
-
-	public void updateDiscontinuedDate(Date discontinuedDate, int computerId) throws ClassNotFoundException, CustomSQLException {
-		String request = "UPDATE computer SET discontinued = '" + discontinuedDate + "' WHERE id = '" +  computerId + "'";
-		execute(request);
-		
-	}
-
-	public void updateManufacturer(int companyId, int computerId) throws ClassNotFoundException, CustomSQLException {
-		String request = "UPDATE computer SET company_id = '" + companyId + "' WHERE id = '" +  computerId + "'";
-		execute(request);
-		
-	}
-	
 }

@@ -1,6 +1,5 @@
 package fr.excilys.cdb.services;
 
-import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -51,23 +50,8 @@ public class ServiceComputer {
 		
 	}
 
-	public void updateManufacturer(int companyId, int computerId) throws ClassNotFoundException, CustomSQLException {
-		daoComputer.updateManufacturer(companyId, computerId);
-		
-	}
-
-	public void updateComputerName(String newCompanyName, int computerId) throws ClassNotFoundException, CustomSQLException {
-		daoComputer.updateComputerName(newCompanyName, computerId);
-		
-	}
-
-	public void updateIntroducedDate(Date stringToDate, int computerId) throws ClassNotFoundException, CustomSQLException {
-		daoComputer.updateIntroducedDate(stringToDate, computerId);
-		
-	}
-
-	public void updateDiscontinuedDate(Date stringToDate, int computerId) throws ClassNotFoundException, CustomSQLException {
-		daoComputer.updateDiscontinuedDate(stringToDate, computerId);
+	public void updateComputer(Computer computer, int computerId) throws ClassNotFoundException, CustomSQLException {
+		daoComputer.updateComputer(computer, computerId);
 		
 	}
 

@@ -5,9 +5,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class Pageable {
-	private int offset = 0;
-	private int limit = 10;
+	private int offsetParameter = 0;
+	private int limitParameter = 10;
 	private int max;
+	
+	private final int NUMBER_OF_INDEXES = 5;
 	
 	/*
 	 * ------------------------------------------
@@ -20,26 +22,25 @@ public class Pageable {
 	}	
 	
 	public void next() {
-		if(offset < max) {
-			offset += limit;
+		if(offsetParameter+limitParameter < max) {
+			offsetParameter += limitParameter;
 		}
 	}
 	
 	public void previous() {
-		if(offset > 0) {
-			offset -= limit;			
+		if(offsetParameter > 0) {
+			offsetParameter -= limitParameter;			
 		}
 	}
 	
 	public List<Integer> sendPageIndexes() {
 	List<Integer> result = new ArrayList<Integer>();
 
-	int count = 1, pageableOffset = this.getOffset(), pageableLimit = this.getLimit(),
-			pageableMax = this.getMax(),
-			numberOfIndexWeWant = (pageableMax / pageableLimit > 6 ? 5 : pageableMax / pageableLimit),
-			maxIndex = pageableMax / pageableLimit, 
-			minIndex = 0, 
-			middleIndex = pageableOffset / pageableLimit;
+	int count = 1;
+	int numberOfIndexWeWant = (max / limitParameter > NUMBER_OF_INDEXES ? NUMBER_OF_INDEXES : max / limitParameter);
+	int maxIndex = max / limitParameter;
+	int	minIndex = 0;
+	int middleIndex = offsetParameter / limitParameter;
 	result.add(middleIndex);
 	
 	boolean sup = true;
@@ -48,15 +49,11 @@ public class Pageable {
 		if (sup && Collections.min(result) - 1 >= minIndex) {
 			result.add(Collections.min(result) - 1);
 			count++;
-			sup = !sup;
 		} else if (!sup && Collections.max(result) + 1 <= maxIndex) {
 			result.add(Collections.max(result) + 1);
 			count++;
-			sup = !sup;
 		}
-		else {
-			sup = !sup;
-		}
+		sup = !sup;
 	}
 
 	Collections.sort(result);
@@ -69,17 +66,17 @@ public class Pageable {
 	 * ------------------------------------------
 	 */
 	
-	public int getOffset() {
-		return offset;
+	public int getOffsetParameter() {
+		return offsetParameter;
 	}
-	public void setOffset(int offset) {
-		this.offset = offset;
+	public void setOffsetParameter(int offsetParameter) {
+		this.offsetParameter = offsetParameter;
 	}
-	public int getLimit() {
-		return limit;
+	public int getLimitParameter() {
+		return limitParameter;
 	}
-	public void setLimit(int limit) {
-		this.limit = limit;
+	public void setLimitParameter(int limitParameter) {
+		this.limitParameter = limitParameter;
 	}
 	public int getMax() {
 		return max;

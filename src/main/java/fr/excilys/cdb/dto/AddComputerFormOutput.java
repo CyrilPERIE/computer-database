@@ -6,7 +6,12 @@ public class AddComputerFormOutput {
 	private String discontinuedDate;
 	private String companyId;
 
-
+	/*
+	 * ------------------------------------------ 
+	 * | 				CONSTRUCTOR				|
+	 * ------------------------------------------
+	 */
+	
 	private AddComputerFormOutput(AddComputerFormOutputBuilder addComputerFormOutputBuilder) {
 		this.computerName = addComputerFormOutputBuilder.computerName;
 		this.introducedDate = addComputerFormOutputBuilder.introducedDate;
@@ -25,9 +30,6 @@ public class AddComputerFormOutput {
 		private String introducedDate;
 		private String discontinuedDate;
 		private String companyId;
-
-		public AddComputerFormOutputBuilder() {
-		}
 
 		public AddComputerFormOutputBuilder withComputerName(String computerName) {
 			this.computerName = computerName;

@@ -14,7 +14,7 @@ import fr.excilys.cdb.exception.CustomSQLException;
 import fr.excilys.cdb.model.Computer;
 import fr.excilys.cdb.services.ServiceComputer;
 
-//@WebServlet("/Test")
+//@WebServlet("/ServletDashboard")
 public class ServletDashboard extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Pageable pageable;
@@ -56,25 +56,25 @@ public class ServletDashboard extends HttpServlet {
 			handleLimit(request);
 		} else if (request.getParameter("page") != null) {
 			int pageIndex = Integer.valueOf(request.getParameter("page"));
-			pageable.setOffset(pageIndex*pageable.getLimit());
+			pageable.setOffsetParameter(pageIndex*pageable.getLimitParameter());
 		}
 	}
 
 	private void handleGo(HttpServletRequest request) {
-		if (request.getParameter("go").toString().equals("next")) {
+		if (("next").equals(request.getParameter("go").toString())) {
 			pageable.next();
-		} else if (request.getParameter("go").toString().equals("previous")) {
+		} else if (("previous").equals(request.getParameter("go").toString())) {
 			pageable.previous();
 		}
 	}
 
 	private void handleLimit(HttpServletRequest request) {
 		if (request.getParameter("limit").toString().equals("10")) {
-			pageable.setLimit(10);
+			pageable.setLimitParameter(10);
 		} else if (request.getParameter("limit").toString().equals("50")) {
-			pageable.setLimit(50);
+			pageable.setLimitParameter(50);
 		} else {
-			pageable.setLimit(100);
+			pageable.setLimitParameter(100);
 		}
 	}
 

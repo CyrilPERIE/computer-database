@@ -15,7 +15,6 @@ public class Main {
 		ControllerCompany.setView();
 		ControllerComputer.setView();
 		view.client();
-		
 						
 	}
 
