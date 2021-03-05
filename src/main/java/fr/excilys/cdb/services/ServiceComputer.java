@@ -60,8 +60,12 @@ public class ServiceComputer {
 		
 	}
 
-	public int totalNumberComputer() throws ClassNotFoundException, CustomSQLException {
-		return daoComputer.totalNumberComputer();
+	public int totalNumberComputer(Pageable pageable) throws ClassNotFoundException, CustomSQLException {
+		return daoComputer.totalNumberComputer(pageable);
+	}
+
+	public List<Computer> selectComputersLikePageableOrderBy(Pageable pageable) throws ClassNotFoundException, CustomSQLException {
+		return daoComputer.selectComputersLikePageableOrderBy(pageable);
 	}
 	
 	/*

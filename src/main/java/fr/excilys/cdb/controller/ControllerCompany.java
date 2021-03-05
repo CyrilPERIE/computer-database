@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import fr.excilys.cdb.database.Pageable;
+import fr.excilys.cdb.exception.CustomSQLException;
 import fr.excilys.cdb.model.Company;
 import fr.excilys.cdb.services.ServiceCompany;
 import fr.excilys.cdb.view.View;
@@ -40,7 +41,7 @@ public class ControllerCompany {
 	 * ------------------------------------------
 	 */
 
-	public void listCompaniesPageable(Pageable pageable) throws SQLException {
+	public void listCompaniesPageable(Pageable pageable) throws ClassNotFoundException, CustomSQLException, SQLException {
 		List<Company> companies = serviceCompany.listCompaniesPageable(pageable);
 		for(Company company : companies) {
 			view.printCompany(company);
@@ -48,7 +49,7 @@ public class ControllerCompany {
 
 	}
 
-	public int getIdCompany(String companyName) throws SQLException {
+	public int getIdCompany(String companyName) throws ClassNotFoundException, SQLException, CustomSQLException {
 		return serviceCompany.getIDCompany(companyName);
 	}
 	

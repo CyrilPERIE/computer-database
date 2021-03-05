@@ -2,12 +2,14 @@ package fr.excilys.cdb.servlets;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import fr.excilys.cdb.database.Pageable;
 import fr.excilys.cdb.exception.CustomSQLException;
@@ -17,81 +19,124 @@ import fr.excilys.cdb.services.ServiceComputer;
 //@WebServlet("/ServletDashboard")
 public class ServletDashboard extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private Pageable pageable;
 	ServiceComputer serviceComputer = ServiceComputer.getInstance();
-	private int totalNumberOfComputer;
 
 	public ServletDashboard() {
-		this.pageable = new Pageable(totalNumberOfComputer);
 	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		HttpSession session = request.getSession();
+		Pageable pageable = (Pageable) session.getAttribute("pageable");
+		if (pageable == null) {
+			pageable = new Pageable(0);
+			session.setAttribute("pageable", pageable);
+		}
+		
+		checkAnyEvent(request, session);
+
+		List<Integer> indexPage = pageable.sendPageIndexes();
+		request.setAttribute("indexPage", indexPage);
+		
+		List<Computer> computers = sendComputers(request, session);
+		request.setAttribute("computers", computers);		
+
+		String totalNumberComputer = String.valueOf(pageable.getMax());
+		request.setAttribute("numberOfComputers", totalNumberComputer);
+		this.getServletContext().getRequestDispatcher("/WEB-INF/lib/views/dashboard.jsp").forward(request, response);
+	}
+
+	private int totalNumberComputer(HttpSession session) {
+		Pageable pageable = (Pageable) session.getAttribute("pageable");
+		int totalNumberOfComputer = 0;
 		try {
-			totalNumberOfComputer = serviceComputer.totalNumberComputer();
+			totalNumberOfComputer = serviceComputer.totalNumberComputer(pageable);
 		} catch (ClassNotFoundException e) {
 			System.out.println("Can't connect to database");
 		} catch (CustomSQLException customSQLException) {
 			customSQLException.noDataDetected();
 		}
-		pageable.setMax(totalNumberOfComputer);
-		checkAnyEvent(request);
-
-		List<Integer> indexPage = pageable.sendPageIndexes();
-		request.setAttribute("indexPage", indexPage);
-
-		List<Computer> computers = sendComputers();
-		request.setAttribute("computers", computers);
-
-		String totalNumberComputer = String.valueOf(totalNumberOfComputer);
-		request.setAttribute("numberOfComputers", totalNumberComputer);
-		this.getServletContext().getRequestDispatcher("/WEB-INF/lib/views/dashboard.jsp").forward(request, response);
+		return totalNumberOfComputer;
 	}
 
-
-
-	private void checkAnyEvent(HttpServletRequest request) {
+	private void checkAnyEvent(HttpServletRequest request, HttpSession session) {
+		Pageable pageable = (Pageable) session.getAttribute("pageable");
 		if (request.getParameter("go") != null) {
-			handleGo(request);
+			handleGo(request, session);
 		} else if (request.getParameter("limit") != null) {
-			handleLimit(request);
+			handleLimit(request, session);
 		} else if (request.getParameter("page") != null) {
 			int pageIndex = Integer.valueOf(request.getParameter("page"));
 			pageable.setOffsetParameter(pageIndex*pageable.getLimitParameter());
 		}
+		session.setAttribute("pageable", pageable);
 	}
 
-	private void handleGo(HttpServletRequest request) {
-		if (("next").equals(request.getParameter("go").toString())) {
+	private void handleGo(HttpServletRequest request, HttpSession session) {
+		Pageable pageable = (Pageable) session.getAttribute("pageable");
+		if (("next").equals(request.getParameter("go"))) {
 			pageable.next();
-		} else if (("previous").equals(request.getParameter("go").toString())) {
+		} else if (("previous").equals(request.getParameter("go"))) {
 			pageable.previous();
 		}
+		session.setAttribute("pageable", pageable);
 	}
 
-	private void handleLimit(HttpServletRequest request) {
-		if (request.getParameter("limit").toString().equals("10")) {
+	private void handleLimit(HttpServletRequest request, HttpSession session) {
+		Pageable pageable = (Pageable) session.getAttribute("pageable");
+		if (request.getParameter("limit").equals("10")) {
 			pageable.setLimitParameter(10);
-		} else if (request.getParameter("limit").toString().equals("50")) {
+		} else if (request.getParameter("limit").equals("50")) {
 			pageable.setLimitParameter(50);
 		} else {
 			pageable.setLimitParameter(100);
 		}
+		session.setAttribute("pageable", pageable);
 	}
 
-	private List<Computer> sendComputers() {
+	private List<Computer> sendComputers(HttpServletRequest request, HttpSession session) {
+		Pageable pageable = (Pageable) session.getAttribute("pageable");
+		String search = request.getParameter("search");
 		List<Computer> computers = new ArrayList<Computer>();
+		
 		try {
-			computers = serviceComputer.listComputersPageable(pageable);
+			if(search != null) {
+				pageable.setSearch(search);
+				
+				int totalNumberOfComputer = totalNumberComputer(session);
+				pageable.setMax(totalNumberOfComputer);
+				
+				
+			}
+			computers = serviceComputer.selectComputersLikePageableOrderBy(pageable);
 		}catch (ClassNotFoundException e) {
 			System.out.println("Can't connect to database");
 		}catch (CustomSQLException customSQLException) {
 			customSQLException.noDataDetected();
 		}
+		session.setAttribute("pageable", pageable);
 		return computers;
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		
+		if (request.getParameter("selection") != null) {
+			List<String> deleteIdList;
+			try {
+				deleteIdList = Arrays.asList(request.getParameter("selection").split(","));
+				for (String id : deleteIdList) {
+					serviceComputer.deleteComputer(Integer.parseInt(id));
+				}
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (CustomSQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		doGet(request, response);
 	}
 

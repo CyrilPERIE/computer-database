@@ -22,12 +22,13 @@ public class DTOComputerMapper {
 			Computer computer = new ComputerBuilder()
 					.computerManufacturer(company)
 					.computerName(addComputerFormOutput.getComputerName())
-					.computerIntroducedDate(Utilitaire.stringToDateWebUI(addComputerFormOutput.getIntroducedDate()))
-					.computerDiscontinuedDate(Utilitaire.stringToDateWebUI(addComputerFormOutput.getDiscontinuedDate()))
+					.computerIntroducedDate(addComputerFormOutput.getIntroducedDate().isEmpty() ? null: Utilitaire.stringToDateWebUI(addComputerFormOutput.getIntroducedDate()))
+					.computerDiscontinuedDate(addComputerFormOutput.getDiscontinuedDate().isEmpty() ? null: Utilitaire.stringToDateWebUI(addComputerFormOutput.getDiscontinuedDate()))
 					.build();
 
 			return computer;
 		} catch(ParseException e) {
+			System.out.println(e.getMessage());
 			throw new ParseError();
 		}
 	}

@@ -17,6 +17,8 @@ public class DAOCompany {
 	private static final String SELECT_ALL_PAGEABLE = "SELECT id, name FROM company limit ? offset ?";
 	private static final String SELECT_ID = "SELECT id FROM company WHERE name = ?";
 	private static final String INSERT_COMPUTER = "INSERT INTO company VALUES (null, ?)";
+	private static final String DELETE_COMPANY = "DELETE FROM company WHERE id = ?";
+	private static final String DELETE_COMPUTER_WHERE_COMPANY = "DELETE FROM computer WHERE company_id = ?";
 	private static DAOCompany daoCompany;
 	private ConnectionHandler connectionHandler;
 
@@ -165,5 +167,36 @@ public class DAOCompany {
 			throw new CustomSQLException();
 		}
 	}
-
+	
+	 public void deleteCompany(Company company) throws SQLException, ClassNotFoundException {
+		    String deleteCompany = DELETE_COMPANY;
+		    String deleteComputer = DELETE_COMPUTER_WHERE_COMPANY;
+		    Connection connection = connectionHandler.openConnection();
+		    try (	PreparedStatement preparedStatementDeleteCompany = connection.prepareStatement(deleteCompany);
+		    		PreparedStatement preparedStatementDeleteComputer = connection.prepareStatement(deleteComputer))
+		    
+		    {
+		    	connection.setAutoCommit(false);
+				
+		    	preparedStatementDeleteComputer.setLong(1, company.getId());
+		    	preparedStatementDeleteComputer.executeUpdate();
+				
+				preparedStatementDeleteCompany.setLong(1, company.getId());
+				preparedStatementDeleteCompany.executeUpdate();
+				
+				connection.commit();
+			}catch(SQLException errorSQL){
+				try {
+					connection.rollback();
+			        } catch (SQLException e) {
+			        	
+			        }
+			}finally {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					
+				}
+			}
+		  }
 }

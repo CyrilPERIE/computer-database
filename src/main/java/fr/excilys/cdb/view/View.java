@@ -7,6 +7,7 @@ import java.util.Scanner;
 import fr.excilys.cdb.controller.ControllerCompany;
 import fr.excilys.cdb.controller.ControllerComputer;
 import fr.excilys.cdb.database.Pageable;
+import fr.excilys.cdb.exception.CustomSQLException;
 import fr.excilys.cdb.exception.LoggerInstance;
 import fr.excilys.cdb.model.Company;
 
@@ -37,10 +38,16 @@ public class View {
 	
 	LoggerInstance loggerInstance = LoggerInstance.getLoggerInstance();
 
-	private View() {
+	private View(Pageable pageable) {
 		this.controllerComputer = ControllerComputer.getInstance();
 		this.controllerCompany = ControllerCompany.getInstance();
-		this.totalNumberComputer = controllerComputer.totalNumberComputer();
+		try {
+			this.totalNumberComputer = controllerComputer.totalNumberComputer(pageable);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/*
@@ -51,7 +58,8 @@ public class View {
 
 	public static View getViewInstance() {
 		if (view == null) {
-			view = new View();
+			Pageable pageable = new Pageable(0);
+			view = new View(pageable);
 		}
 		return view;
 	}
@@ -103,19 +111,25 @@ public class View {
 				loggerInstance.expectLoop(LoggerInstance.Messages.wrongIDFormat.getMessage());
 				e.printStackTrace();
 			}finally {break;}
-			case CREATE_COMPUTER: try {
-				controllerComputer.createComputer();
-			} catch (ParseException e) {
-				loggerInstance.expectLoop(LoggerInstance.Messages.wrongDateFormat.getMessage());
-			}finally {break;}
+//			case CREATE_COMPUTER: try {
+//				controllerComputer.createComputer();
+//			} catch (ParseException e) {
+//				loggerInstance.expectLoop(LoggerInstance.Messages.wrongDateFormat.getMessage());
+//			}finally {break;}
 			case UPDATE_COMPUTER: try {
 				controllerComputer.updateComputer();
-			} catch (ParseException e) {
-				loggerInstance.expectLoop(LoggerInstance.Messages.wrongDateFormat.getMessage());
 			} catch (SQLException e) {
 				loggerInstance.expectLoop(LoggerInstance.Messages.nonExistentID.getMessage());
 			}finally {break;}
-			case DELETE_COMPUTER: controllerComputer.deleteComputer(); break;
+			case DELETE_COMPUTER: try {
+				controllerComputer.deleteComputer();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CustomSQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} break;
 			default: System.out.println("bye");result =  false;
 		
 		}
@@ -133,7 +147,15 @@ public class View {
 		Pageable pageable = new Pageable(totalNumberComputer);
 		scanner.nextLine();
 		do {
-			controllerComputer.listComputersPageable(pageable);
+			try {
+				controllerComputer.listComputersPageable(pageable);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CustomSQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			exit = pageableHandler(pageable);
 		}while(exit);
 	}
@@ -143,7 +165,18 @@ public class View {
 		Pageable pageable = new Pageable(totalNumberComputer);
 		scanner.nextLine();
 		do {
-			controllerCompany.listCompaniesPageable(pageable);
+			try {
+				controllerCompany.listCompaniesPageable(pageable);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CustomSQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			exit = pageableHandler(pageable);
 		}while(exit);
 	}

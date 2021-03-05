@@ -17,6 +17,11 @@ import fr.excilys.cdb.model.Computer.ComputerBuilder;
 
 public class DAOComputer {
 
+	private static final String PAGEABLE = " limit ? offset ?";
+	private static final String SELECT_COMPUTERS_LIKE = "SELECT computer.name, computer.introduced, computer.discontinued, computer.id, company.name "
+				+ "FROM computer "
+				+ "JOIN company ON company.id = computer.company_id " 
+				+ "WHERE computer.name LIKE ? ";
 	private static final String UPDATE_COMPUTER = "UPDATE computer "
 			+ "SET name = ?, introduced = ?, discontinued = ?, company_id = ? "
 			+ "WHERE id = ?";
@@ -26,15 +31,14 @@ public class DAOComputer {
 			+ " FROM computer"
 			+ " LEFT JOIN company ON company.id = computer.company_id" 
 			+ " WHERE computer.id = ? ";
-	private static final String COUNT_COMPUTERS = "SELECT COUNT(id) FROM computer";
+	private static final String COUNT_COMPUTERS = "SELECT COUNT(computer.id) "
+			+ "FROM computer "
+			+ "LEFT JOIN company ON company.id = computer.company_id " 
+			+ "WHERE computer.name LIKE ? ";
 	private static final String SELECT_COMPUTERS_PAGEABLE = "SELECT computer.name, computer.introduced, computer.discontinued, computer.id, company.name "
 			+ "FROM computer " 
 			+ "LEFT JOIN company ON company.id = computer.company_id " 
-			+ "limit ? offset ?";
-	private static final String SELECT_COMPUTERS_LIKE = "SELECT computer.name, computer.introduced, computer.discontinued, computer.id, company.name"
-			+ " FROM computer"
-			+ " JOIN company ON company.id = computer.company_id" 
-			+ " WHERE computer.name LIKE ?";
+			+ PAGEABLE;
 	private static DAOComputer daoComputer;
 	private ConnectionHandler connectionHandler;
 
@@ -136,17 +140,20 @@ public class DAOComputer {
 
 	}
 	
-	public List<Computer> selectComputersLike(String like) throws ClassNotFoundException, CustomSQLException {
-		String request = SELECT_COMPUTERS_LIKE;
+	public List<Computer> selectComputersLikePageableOrderBy(Pageable pageable) throws ClassNotFoundException, CustomSQLException {
+		String request = SELECT_COMPUTERS_LIKE
+				+ "ORDER BY " + pageable.getOrderBy()	
+				+ PAGEABLE;
 		List<Computer> computers = new ArrayList<Computer>();
 		try (Connection connection = connectionHandler.openConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
-			preparedStatement.setString(1, "%" + like + "%");
+			preparedStatement.setString(1, "%" + pageable.getSearch() + "%");
+			preparedStatement.setInt(2, pageable.getLimitParameter());
+			preparedStatement.setInt(3, pageable.getOffsetParameter());
 			ResultSet resultSet = preparedStatement.executeQuery();
 			computers = resultSetToList(resultSet);
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			throw new CustomSQLException();
+			throw new CustomSQLException(e.getMessage());
 		}
 
 		return computers;
@@ -164,21 +171,24 @@ public class DAOComputer {
 			ResultSet resultSet = preparedStatement.executeQuery();
 			computers = resultSetToList(resultSet);
 		} catch (SQLException e) {
-			throw new CustomSQLException();
+			throw new CustomSQLException(e.getMessage());
 		}
 		return computers;
 	}
 
-	public int totalNumberComputer() throws ClassNotFoundException, CustomSQLException {
+	public int totalNumberComputer(Pageable pageable) throws ClassNotFoundException, CustomSQLException {
 		String request = COUNT_COMPUTERS;
 		int result = 0;
 		try (Connection connection = connectionHandler.openConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
+			System.out.println(pageable.getSearch());
+			preparedStatement.setString(1, "%" + pageable.getSearch() + "%");
 			ResultSet resultSet = preparedStatement.executeQuery();
 			resultSet.next();
-			result = resultSet.getInt("COUNT(id)");
+			result = resultSet.getInt("COUNT(computer.id)");
+			System.out.println(result);
 		} catch (SQLException e) {
-			throw new CustomSQLException();
+			throw new CustomSQLException(e.getMessage());
 		}
 
 		return result;
@@ -197,7 +207,7 @@ public class DAOComputer {
 			preparedStatement.setInt(1, computerId);
 			preparedStatement.execute();
 		} catch (SQLException e) {
-			throw new CustomSQLException();
+			throw new CustomSQLException(e.getMessage());
 		}
 	}
 
@@ -215,7 +225,7 @@ public class DAOComputer {
 			preparedStatement.setInt(4, computer.getManufacturer().getId());
 			preparedStatement.execute();
 		} catch (SQLException e) {
-			throw new CustomSQLException();
+			throw new CustomSQLException(e.getMessage());
 		}
 
 	}
@@ -235,8 +245,7 @@ public class DAOComputer {
 			preparedStatement.setInt(5, computerId);
 			preparedStatement.execute();
 		} catch (SQLException e) {
-			System.out.println("erreur");
-			throw new CustomSQLException();
+			throw new CustomSQLException(e.getMessage());
 		}
 
 	}

@@ -6,9 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="utf-8">
 <!-- Bootstrap -->
-<style><%@include file="../css/bootstrap.min.css"%></style>
-<style><%@include file="../css/font-awesome.css"%></style>
-<style><%@include file="../css/main.css"%></style>
+<link href="../../cdb/css/bootstrap.min.css" rel="stylesheet" media="screen">
+<link href="../../cdb/css/font-awesome.css" rel="stylesheet" media="screen">
+<link href="../../cdb/css/main.css" rel="stylesheet" media="screen">
 
 </head>
 <body>
@@ -27,14 +27,15 @@
 					<form id="searchForm" action="#" method="GET" class="form-inline">
 
 						<input type="search" id="searchbox" name="search"
-							class="form-control" placeholder="Search name" /> <input
-							type="submit" id="searchsubmit" value="Filter by name"
+							class="form-control" placeholder="Search name" /> 
+						<input type="submit" id="searchsubmit" value="Filter by name"
 							class="btn btn-primary" />
 					</form>
 				</div>
 				<div class="pull-right">
 					<a class="btn btn-success" id="addComputer" href="/cdb/addComputer">Add
-						Computer</a> <a class="btn btn-default" id="editComputer" href="#"
+						Computer</a> 
+					<a class="btn btn-default" id="editComputer" href="#"
 						onclick="$.fn.toggleEditMode();">Edit</a>
 				</div>
 			</div>
@@ -72,7 +73,7 @@
 
 						<tr>
 							<td class="editMode"><input type="checkbox" name="cb"
-								class="cb" value="0"></td>
+								class="cb" value="${computer.id}"></td>
 							<td><a href="<c:url value="editComputer">
 							<c:param name="id" value="${computer.id}"/></c:url>">${computer.name}</a>
 							</td>
@@ -112,9 +113,10 @@
 		</div>
 
 	</footer>
-	<script src="../js/jquery.min.js"></script>
-	<script src="../js/bootstrap.min.js"></script>
-	<script src="../js/dashboard.js"></script>
+	
+	<script src="../../cdb/js/jquery.min.js"></script>
+	<script src="../../cdb/js/bootstrap.min.js"></script>
+	<script src="../../cdb/js/dashboard.js"></script>
 
 </body>
 </html>

@@ -8,6 +8,8 @@ public class Pageable {
 	private int offsetParameter = 0;
 	private int limitParameter = 10;
 	private int max;
+	private String search;
+	private String orderBy;
 	
 	private final int NUMBER_OF_INDEXES = 5;
 	
@@ -19,6 +21,8 @@ public class Pageable {
 	
 	public Pageable(int max) {
 		this.max = max;
+		this.search = "";
+		this.orderBy = "computer.id";
 	}	
 	
 	public void next() {
@@ -60,6 +64,12 @@ public class Pageable {
 	return result;
 }
 	
+	public void reset() {
+		offsetParameter = 0;
+		this.orderBy = "computer.id";
+		this.limitParameter = 10;
+	}
+	
 	/*
 	 * ------------------------------------------
 	 * |             SETTER & GETTER            |
@@ -83,6 +93,30 @@ public class Pageable {
 	}
 	public void setMax(int max) {
 		this.max = max;
+	}
+
+	public String getSearch() {
+		return search;
+	}
+
+	public void setSearch(String search) {
+		if(search != this.search) {
+			reset();
+		}
+		if(search == null) {
+			this.search = "";
+		}
+		else {
+			this.search = search;			
+		}
+	}
+
+	public String getOrderBy() {
+		return orderBy;
+	}
+
+	public void setOrderBy(String orderBy) {
+		this.orderBy = orderBy;
 	}
 	
 }

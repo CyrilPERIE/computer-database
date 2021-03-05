@@ -5,11 +5,10 @@
 <title>Computer Database</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- Bootstrap -->
-<style><%@include file="../css/bootstrap.min.css"%></style>
-<style><%@include file="../css/font-awesome.css"%></style>
-<style><%@include file="../css/main.css"%></style>
+<link href="../../cdb/css/bootstrap.min.css" rel="stylesheet" media="screen">
+<link href="../../cdb/css/font-awesome.css" rel="stylesheet" media="screen">
+<link href="../../cdb/css/main.css" rel="stylesheet" media="screen">
 
-<script><%@include file="../js/addComputer.js"%></script>
 </head>
 <body>
     <header class="navbar navbar-inverse navbar-fixed-top">
@@ -63,5 +62,6 @@
             </div>
         </div>
     </section>
+    <script src="../../cdb/js/addComputer.js"></script>
 </body>
 </html>
