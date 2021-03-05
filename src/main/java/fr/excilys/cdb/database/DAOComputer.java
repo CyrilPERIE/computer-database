@@ -110,7 +110,7 @@ public class DAOComputer {
 	}
 
 	private List<Computer> resultSetToList(ResultSet resultSet) throws SQLException {
-		List<Computer> computers = new ArrayList<Computer>();
+		List<Computer> computers = new ArrayList<>();
 		while (resultSet.next()) {
 			computers.add(resultSetToComputerObject(resultSet));
 		}
@@ -125,7 +125,7 @@ public class DAOComputer {
 
 	public List<Computer> listComputersPageable(Pageable pageable) throws ClassNotFoundException, CustomSQLException {
 		String request = SELECT_COMPUTERS_PAGEABLE;
-		List<Computer> computers = new ArrayList<Computer>();
+		List<Computer> computers = new ArrayList<>();
 		try (Connection connection = connectionHandler.openConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setInt(1, pageable.getLimitParameter());
@@ -144,7 +144,7 @@ public class DAOComputer {
 		String request = SELECT_COMPUTERS_LIKE
 				+ "ORDER BY " + pageable.getOrderBy()	
 				+ PAGEABLE;
-		List<Computer> computers = new ArrayList<Computer>();
+		List<Computer> computers = new ArrayList<>();
 		try (Connection connection = connectionHandler.openConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setString(1, "%" + pageable.getSearch() + "%");
@@ -164,7 +164,7 @@ public class DAOComputer {
 			throws SQLException, ClassNotFoundException, CustomSQLException {
 		String request = SELECT_ONE_COMPUTER;
 
-		List<Computer> computers = new ArrayList<Computer>();
+		List<Computer> computers = new ArrayList<>();
 		try (Connection connection = connectionHandler.openConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setInt(1, computerId);
@@ -181,12 +181,10 @@ public class DAOComputer {
 		int result = 0;
 		try (Connection connection = connectionHandler.openConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
-			System.out.println(pageable.getSearch());
 			preparedStatement.setString(1, "%" + pageable.getSearch() + "%");
 			ResultSet resultSet = preparedStatement.executeQuery();
 			resultSet.next();
 			result = resultSet.getInt("COUNT(computer.id)");
-			System.out.println(result);
 		} catch (SQLException e) {
 			throw new CustomSQLException(e.getMessage());
 		}

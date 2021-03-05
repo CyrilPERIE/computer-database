@@ -69,6 +69,9 @@ public class ServletDashboard extends HttpServlet {
 			int pageIndex = Integer.valueOf(request.getParameter("page"));
 			pageable.setOffsetParameter(pageIndex*pageable.getLimitParameter());
 		}
+		else if (request.getParameter("orderBy") != null) {
+			pageable.setOrderBy(request.getParameter("orderBy"));
+		}
 		session.setAttribute("pageable", pageable);
 	}
 

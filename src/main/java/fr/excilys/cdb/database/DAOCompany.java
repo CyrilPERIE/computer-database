@@ -178,10 +178,10 @@ public class DAOCompany {
 		    {
 		    	connection.setAutoCommit(false);
 				
-		    	preparedStatementDeleteComputer.setLong(1, company.getId());
+		    	preparedStatementDeleteComputer.setInt(1, company.getId());
 		    	preparedStatementDeleteComputer.executeUpdate();
 				
-				preparedStatementDeleteCompany.setLong(1, company.getId());
+				preparedStatementDeleteCompany.setInt(1, company.getId());
 				preparedStatementDeleteCompany.executeUpdate();
 				
 				connection.commit();

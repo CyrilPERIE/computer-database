@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class Pageable {
+	
 	private int offsetParameter = 0;
 	private int limitParameter = 10;
 	private int max;
