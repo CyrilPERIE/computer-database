@@ -20,7 +20,7 @@ public class DAOComputer {
 	private static final String PAGEABLE = " limit ? offset ?";
 	private static final String SELECT_COMPUTERS_LIKE = "SELECT computer.name, computer.introduced, computer.discontinued, computer.id, company.name "
 				+ "FROM computer "
-				+ "JOIN company ON company.id = computer.company_id " 
+				+ "LEFT JOIN company ON company.id = computer.company_id " 
 				+ "WHERE computer.name LIKE ? ";
 	private static final String UPDATE_COMPUTER = "UPDATE computer "
 			+ "SET name = ?, introduced = ?, discontinued = ?, company_id = ? "
@@ -227,7 +227,7 @@ public class DAOComputer {
 		}
 
 	}
-
+	
 	public void updateComputer(Computer computer, int computerId) throws ClassNotFoundException, CustomSQLException {
 		String request = UPDATE_COMPUTER;
 		try (Connection connection = connectionHandler.openConnection();
