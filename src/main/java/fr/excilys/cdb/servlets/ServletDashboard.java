@@ -21,9 +21,6 @@ public class ServletDashboard extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	ServiceComputer serviceComputer = ServiceComputer.getInstance();
 
-	public ServletDashboard() {
-	}
-
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		HttpSession session = request.getSession();
@@ -34,18 +31,41 @@ public class ServletDashboard extends HttpServlet {
 		}
 		
 		checkAnyEvent(request, session);
-
-		List<Integer> indexPage = pageable.sendPageIndexes();
-		request.setAttribute("indexPage", indexPage);
 		
 		List<Computer> computers = sendComputers(request, session);
 		request.setAttribute("computers", computers);		
 
 		String totalNumberComputer = String.valueOf(pageable.getMax());
 		request.setAttribute("numberOfComputers", totalNumberComputer);
+		
+		List<Integer> indexPage = pageable.sendPageIndexes();
+		request.setAttribute("indexPage", indexPage);
+		
 		this.getServletContext().getRequestDispatcher("/WEB-INF/lib/views/dashboard.jsp").forward(request, response);
 	}
 
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		if (request.getParameter("selection") != null) {
+			List<String> deleteIdList;
+			try {
+				deleteIdList = Arrays.asList(request.getParameter("selection").split(","));
+				for (String id : deleteIdList) {
+					serviceComputer.deleteComputer(Integer.parseInt(id));
+				}
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (CustomSQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		doGet(request, response);
+	}
+	
 	private int totalNumberComputer(HttpSession session) {
 		Pageable pageable = (Pageable) session.getAttribute("pageable");
 		int totalNumberOfComputer = 0;
@@ -105,42 +125,20 @@ public class ServletDashboard extends HttpServlet {
 		try {
 			if(search != null) {
 				pageable.setSearch(search);
-				
-				int totalNumberOfComputer = totalNumberComputer(session);
-				pageable.setMax(totalNumberOfComputer);
-				
-				
 			}
+			
 			computers = serviceComputer.selectComputersLikePageableOrderBy(pageable);
 		}catch (ClassNotFoundException e) {
 			System.out.println("Can't connect to database");
 		}catch (CustomSQLException customSQLException) {
 			customSQLException.noDataDetected();
 		}
+	
+		int totalNumberOfComputer = totalNumberComputer(session);
+		pageable.setMax(totalNumberOfComputer);
+		
 		session.setAttribute("pageable", pageable);
 		return computers;
-	}
-
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		
-		if (request.getParameter("selection") != null) {
-			List<String> deleteIdList;
-			try {
-				deleteIdList = Arrays.asList(request.getParameter("selection").split(","));
-				for (String id : deleteIdList) {
-					serviceComputer.deleteComputer(Integer.parseInt(id));
-				}
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			} catch (CustomSQLException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		doGet(request, response);
 	}
 
 }
