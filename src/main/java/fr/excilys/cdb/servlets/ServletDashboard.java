@@ -5,11 +5,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import fr.excilys.cdb.database.Pageable;
 import fr.excilys.cdb.exception.CustomSQLException;
@@ -19,14 +23,21 @@ import fr.excilys.cdb.services.ServiceComputer;
 //@WebServlet("/ServletDashboard")
 public class ServletDashboard extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	ServiceComputer serviceComputer = ServiceComputer.getInstance();
-
+	@Autowired
+	ServiceComputer serviceComputer;
+	
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+		super.init(config);
+	}
+	
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		HttpSession session = request.getSession();
 		Pageable pageable = (Pageable) session.getAttribute("pageable");
 		if (pageable == null) {
-			pageable = new Pageable(0);
+			pageable = new Pageable();
 			session.setAttribute("pageable", pageable);
 		}
 		
@@ -35,7 +46,7 @@ public class ServletDashboard extends HttpServlet {
 		List<Computer> computers = sendComputers(request, session);
 		request.setAttribute("computers", computers);		
 
-		String totalNumberComputer = String.valueOf(pageable.getMax());
+		String totalNumberComputer = String.valueOf(pageable.getMaxComputer());
 		request.setAttribute("numberOfComputers", totalNumberComputer);
 		
 		List<Integer> indexPage = pageable.sendPageIndexes();
@@ -135,7 +146,7 @@ public class ServletDashboard extends HttpServlet {
 		}
 	
 		int totalNumberOfComputer = totalNumberComputer(session);
-		pageable.setMax(totalNumberOfComputer);
+		pageable.setMaxComputer(totalNumberOfComputer);
 		
 		session.setAttribute("pageable", pageable);
 		return computers;

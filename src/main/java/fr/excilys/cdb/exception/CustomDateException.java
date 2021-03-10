@@ -7,7 +7,6 @@ public class CustomDateException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LoggerFactory.getLogger(EmptyError.class);
-	LoggerInstance loggerInstance = LoggerInstance.getLoggerInstance();
 
 	public CustomDateException() {
 		super();

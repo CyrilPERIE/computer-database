@@ -1,76 +1,38 @@
 package fr.excilys.cdb.database;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ConnectionHandler {
 	
-	private String username = "admincdb";
-	private String password = "qwerty1234";
-	private String url = "jdbc:mysql://localhost:3306/computer-database-db";
-
-	private static ConnectionHandler connectionHandler;
-
-	private ConnectionHandler() {
+    private static HikariConfig config = new HikariConfig();
+    private static HikariDataSource datasource;
+	
+	public void openConnection() {
+		ConnectionHandlerProperties connectionHandlerProperties = ConnectionHandlerProperties.getInstance();
+		config.setDriverClassName(connectionHandlerProperties.getDriver());
+		config.setJdbcUrl(connectionHandlerProperties.getUrl());
+        config.setUsername(connectionHandlerProperties.getLogin());
+        config.setPassword(connectionHandlerProperties.getPassword());
+        config.addDataSourceProperty( "cachePrepStmts" , "true" );
+        config.addDataSourceProperty( "prepStmtCacheSize" , "250" );
+        config.addDataSourceProperty( "prepStmtCacheSqlLimit" , "2048" );
+        datasource = new HikariDataSource(config);
 	}
 	
-	public Connection openConnection() throws SQLException, ClassNotFoundException {
-		Class.forName("com.mysql.cj.jdbc.Driver");
-		return DriverManager.getConnection(url, username, password);
-	}
-	/*
-	 * ------------------------------------------
-	 * |               SINGLETON                |
-	 * ------------------------------------------
-	 */
-	
-	public static ConnectionHandler getInstance() {
-		if (connectionHandler == null) {
-			connectionHandler = new ConnectionHandler();
+	Connection getConnection() throws SQLException {
+		if(datasource == null || datasource.isClosed()) {
+			openConnection();
 		}
-		return connectionHandler;
+		return datasource.getConnection();		
 	}
-
-	
-	/*
-	 * ------------------------------------------
-	 * |             SETTER & GETTER            |
-	 * ------------------------------------------
-	 */
-	
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	public ConnectionHandler getConnectionHandler() {
-		return connectionHandler;
-	}
-
-	public void setConnectionHandler(ConnectionHandler connectionHandler) {
-		ConnectionHandler.connectionHandler = connectionHandler;
-	}
-	
-	
-	
 }

@@ -3,6 +3,12 @@ package fr.excilys.cdb.view;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Scanner;
+import java.util.logging.Logger;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import fr.excilys.cdb.controller.ControllerCompany;
 import fr.excilys.cdb.controller.ControllerComputer;
@@ -11,58 +17,32 @@ import fr.excilys.cdb.exception.CustomSQLException;
 import fr.excilys.cdb.exception.LoggerInstance;
 import fr.excilys.cdb.model.Company;
 
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class View {
 	
-	final private String LIST_COMPUTERS = "1";
-	final private String LIST_COMPANIES = "2";
-	final private String SHOW_SPECIFIC_COMPUTER = "3";
-	final private String CREATE_COMPUTER = "4";
-	final private String UPDATE_COMPUTER = "5";
-	final private String DELETE_COMPUTER = "6";
+	private final String LIST_COMPUTERS = "1";
+	private final String LIST_COMPANIES = "2";
+	private final String SHOW_SPECIFIC_COMPUTER = "3";
+	private final String CREATE_COMPUTER = "4";
+	private final String UPDATE_COMPUTER = "5";
+	private final String DELETE_COMPUTER = "6";
 	
-	final private String CASE_PREVIOUS = "1";
-	final private String CASE_NEXT = "2";
+	private final String CASE_PREVIOUS = "1";
+	private final String CASE_NEXT = "2";
 	
-	public final static int UPDATE_MANUFACTURER_NAME = 1;
-	public final static int UPDATE_COMPUTER_NAME = 2;
-	public final static int UPDATE_INTRODUCED_DATE = 3;
-	public final static int UPDATE_DISCONTINUED_DATE = 4;
+	public static final int UPDATE_MANUFACTURER_NAME = 1;
+	public static final int UPDATE_COMPUTER_NAME = 2;
+	public static final int UPDATE_INTRODUCED_DATE = 3;
+	public static final int UPDATE_DISCONTINUED_DATE = 4;
 	
 	
 	private Scanner scanner = new Scanner(System.in);
+	@Autowired
 	private ControllerCompany controllerCompany;
+	@Autowired
 	private ControllerComputer controllerComputer;
-	private int totalNumberComputer;
-	
-	private static View view;
-	
-	LoggerInstance loggerInstance = LoggerInstance.getLoggerInstance();
-
-	private View(Pageable pageable) {
-		this.controllerComputer = ControllerComputer.getInstance();
-		this.controllerCompany = ControllerCompany.getInstance();
-		try {
-			this.totalNumberComputer = controllerComputer.totalNumberComputer(pageable);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (CustomSQLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/*
-	 * ------------------------------------------ 
-	 * |                SINGLETON               |
-	 * ------------------------------------------
-	 */
-
-	public static View getViewInstance() {
-		if (view == null) {
-			Pageable pageable = new Pageable(0);
-			view = new View(pageable);
-		}
-		return view;
-	}
+	Pageable pageable = new Pageable();
 
 	/*
 	 * ------------------------------------------ 
@@ -70,7 +50,7 @@ public class View {
 	 * ------------------------------------------
 	 */	
 	
-	public void client() throws ParseException{
+	public void client() {
 		String choice;
 		boolean continueBoolean = true;
 		
@@ -97,18 +77,18 @@ public class View {
 			case LIST_COMPUTERS: try {
 				listComputers();
 			} catch (SQLException e) {
-				loggerInstance.expectLoop(LoggerInstance.Messages.emptyBase.getMessage());
+				LoggerInstance.expectLoop(LoggerInstance.Messages.emptyBase.getMessage());
 				 
 			}finally {break;}
 			case LIST_COMPANIES: try {
 				listCompanies();
 			} catch (SQLException e) {
-				loggerInstance.expectLoop(LoggerInstance.Messages.emptyBase.getMessage());
+				LoggerInstance.expectLoop(LoggerInstance.Messages.emptyBase.getMessage());
 			}finally {break;}
 			case SHOW_SPECIFIC_COMPUTER: try {
 				controllerComputer.showComputerDetails();
 			} catch (SQLException e) {
-				loggerInstance.expectLoop(LoggerInstance.Messages.wrongIDFormat.getMessage());
+				LoggerInstance.expectLoop(LoggerInstance.Messages.wrongIDFormat.getMessage());
 				e.printStackTrace();
 			}finally {break;}
 //			case CREATE_COMPUTER: try {
@@ -119,15 +99,13 @@ public class View {
 			case UPDATE_COMPUTER: try {
 				controllerComputer.updateComputer();
 			} catch (SQLException e) {
-				loggerInstance.expectLoop(LoggerInstance.Messages.nonExistentID.getMessage());
+				LoggerInstance.expectLoop(LoggerInstance.Messages.nonExistentID.getMessage());
 			}finally {break;}
 			case DELETE_COMPUTER: try {
 				controllerComputer.deleteComputer();
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (CustomSQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} break;
 			default: System.out.println("bye");result =  false;
@@ -144,13 +122,12 @@ public class View {
 	
 	public void listComputers() throws SQLException {
 		boolean exit = true;
-		Pageable pageable = new Pageable(totalNumberComputer);
+		Pageable pageable = new Pageable();
 		scanner.nextLine();
 		do {
 			try {
 				controllerComputer.listComputersPageable(pageable);
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (CustomSQLException e) {
 				// TODO Auto-generated catch block
@@ -162,7 +139,7 @@ public class View {
 	
 	public void listCompanies() throws SQLException {
 		boolean exit = true;
-		Pageable pageable = new Pageable(totalNumberComputer);
+		Pageable pageable = new Pageable();
 		scanner.nextLine();
 		do {
 			try {
@@ -265,7 +242,7 @@ public class View {
 			return scanner.nextInt();
 		}
 		catch(Exception e) {
-			 loggerInstance.expectLoop(LoggerInstance.Messages.wrongIDFormat.getMessage());
+			LoggerInstance.expectLoop(LoggerInstance.Messages.wrongIDFormat.getMessage());
 			 return 0;
 		}
 	}

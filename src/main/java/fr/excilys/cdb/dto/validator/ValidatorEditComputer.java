@@ -5,13 +5,20 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import fr.excilys.cdb.controller.Utilitaire;
 import fr.excilys.cdb.dto.EditComputerFormInput;
 import fr.excilys.cdb.exception.CustomDateException;
 import fr.excilys.cdb.exception.EmptyError;
 import fr.excilys.cdb.exception.ParseError;
 
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ValidatorEditComputer {
+	
 	/*
 	 * ------------------------------------------ 
 	 * | 				Test Fcs				|

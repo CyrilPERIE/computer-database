@@ -7,10 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import fr.excilys.cdb.dto.EditComputerFormInput;
 import fr.excilys.cdb.dto.mapper.ComputerDTOMapper;
@@ -30,13 +34,19 @@ import fr.excilys.cdb.services.ServiceComputer;
 public class ServletEditComputer extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	Map<String, String> errors = new HashMap<>();
+	@Autowired
+	private ServiceComputer serviceComputer;
+	@Autowired
+	private ServiceCompany serviceCompany;
        
-    public ServletEditComputer() {
-    }
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+		super.init(config);
+	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if (request.getParameter("id") != null) {
-			ServiceComputer serviceComputer = ServiceComputer.getInstance();
 			try {
 				Computer computer = serviceComputer.showComputerDetails(Integer.valueOf(request.getParameter("id"))).get(0);
 				EditComputerFormInput editComputerFormInput = ComputerDTOMapper.computerToAddComputerFormOutput(computer);
@@ -46,7 +56,6 @@ public class ServletEditComputer extends HttpServlet {
 			}
 		}
 		
-		ServiceCompany serviceCompany = ServiceCompany.getServiceCompanyInstance();
 		List<Company> companies = new ArrayList<Company>();
 		try {
 			companies = serviceCompany.listCompanies();
@@ -81,7 +90,6 @@ public class ServletEditComputer extends HttpServlet {
 	private void validateUserEntries(EditComputerFormInput editComputerFormInput) {
 		try {
 			ValidatorEditComputer.validate(editComputerFormInput);
-			ServiceComputer serviceComputer = ServiceComputer.getInstance();
 			Computer computer = DTOComputerMapper.editComputerFormOutputToComputer(editComputerFormInput);
 			serviceComputer.updateComputer(computer, computer.getId());
 		} catch (ParseError parseError) {

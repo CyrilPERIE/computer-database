@@ -3,32 +3,21 @@ package fr.excilys.cdb.services;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import fr.excilys.cdb.database.DAOComputer;
 import fr.excilys.cdb.database.Pageable;
 import fr.excilys.cdb.exception.CustomSQLException;
 import fr.excilys.cdb.model.Computer;
 
+@Component
 public class ServiceComputer {
-
-	private static ServiceComputer serviceComputer;
+	
+	@Autowired
 	private DAOComputer daoComputer;
-
-	private ServiceComputer() {
-		this.daoComputer = DAOComputer.getInstance();
-	}
-
-	/*
-	 * ------------------------------------------ 
-	 * | 				SINGLETON				|
-	 * ------------------------------------------
-	 */
-
-	public static ServiceComputer getInstance() {
-		if (serviceComputer == null) {
-			serviceComputer = new ServiceComputer();
-		}
-		return serviceComputer;
-	}
 
 
 	/*

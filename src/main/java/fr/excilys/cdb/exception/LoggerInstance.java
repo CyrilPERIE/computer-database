@@ -2,25 +2,18 @@ package fr.excilys.cdb.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class LoggerInstance {
 	
-	private static final Logger logger = LoggerFactory.getLogger(LoggerInstance.class);;
-	private static LoggerInstance loggerInstance;
+	private static final Logger logger = LoggerFactory.getLogger(LoggerInstance.class);
 	
-	private LoggerInstance() {
-		
-	}
-	
-	public void expectLoop(String message) {
+	public static void expectLoop(String message) {
         logger.debug(message); 
-	}
-	
-	public static LoggerInstance getLoggerInstance() {
-		if (logger == null) {
-			loggerInstance = new LoggerInstance(); 
-		}
-		return loggerInstance;
 	}
 	
 	public enum Messages {
@@ -45,7 +38,7 @@ public class LoggerInstance {
 		
 	}
 
-	public Logger getLogger() {
+	public static Logger getLogger() {
 		return logger;
 	}
 	

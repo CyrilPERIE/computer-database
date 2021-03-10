@@ -6,10 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import fr.excilys.cdb.dto.AddComputerFormOutput;
 import fr.excilys.cdb.dto.mapper.DTOComputerMapper;
@@ -27,13 +31,18 @@ import fr.excilys.cdb.services.ServiceComputer;
 public class ServletAddComputer extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	Map<String, String> errors = new HashMap<>();
+	@Autowired
+	ServiceComputer serviceComputer;
+	@Autowired
+	ServiceCompany serviceCompany;
 
-	public ServletAddComputer() {
-
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+		super.init(config);
 	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ServiceCompany serviceCompany = ServiceCompany.getServiceCompanyInstance();
 		List<Company> companies = new ArrayList<Company>();
 		try {
 			companies = serviceCompany.listCompanies();
@@ -68,7 +77,6 @@ public class ServletAddComputer extends HttpServlet {
 	private void validateUserEntries(AddComputerFormOutput addComputerFormOutput) {
 		try {
 			ValidatorAddComputer.validate(addComputerFormOutput);
-			ServiceComputer serviceComputer = ServiceComputer.getInstance();
 			Computer computer = DTOComputerMapper.addComputerFormOutputToComputer(addComputerFormOutput);
 			serviceComputer.createComputer(computer);
 		} catch (ParseError parseError) {

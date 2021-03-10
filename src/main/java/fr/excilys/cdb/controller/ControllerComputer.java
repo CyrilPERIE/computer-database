@@ -3,6 +3,11 @@ package fr.excilys.cdb.controller;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import fr.excilys.cdb.database.Pageable;
 import fr.excilys.cdb.exception.CustomSQLException;
 import fr.excilys.cdb.exception.LoggerInstance;
@@ -10,33 +15,14 @@ import fr.excilys.cdb.model.Computer;
 import fr.excilys.cdb.services.ServiceComputer;
 import fr.excilys.cdb.view.View;
 
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ControllerComputer {
-
-	LoggerInstance loggerInstance = LoggerInstance.getLoggerInstance();
+	
+	@Autowired
 	private ServiceComputer serviceComputer;
+	@Autowired
 	private static View view;
-	
-	private static ControllerComputer controllerComputer;
-
-	private ControllerComputer() {
-		this.serviceComputer = ServiceComputer.getInstance();
-	}
-	
-	public static void setView() {
-		view = View.getViewInstance();
-	}
-	/*
-	 * ------------------------------------------ 
-	 * |                SINGLETON               |
-	 * ------------------------------------------
-	 */
-
-	public static ControllerComputer getInstance() {
-		if (controllerComputer == null) {
-			controllerComputer = new ControllerComputer();
-		}
-		return controllerComputer;
-	}
 
 	/*
 	 * ------------------------------------------ 

@@ -8,9 +8,16 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import fr.excilys.cdb.exception.CustomSQLException;
 import fr.excilys.cdb.model.Company;
 
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class DAOCompany {
 	
 	private static final String SELECT_ALL_NAME = "SELECT id, name FROM company";
@@ -19,27 +26,12 @@ public class DAOCompany {
 	private static final String INSERT_COMPUTER = "INSERT INTO company VALUES (null, ?)";
 	private static final String DELETE_COMPANY = "DELETE FROM company WHERE id = ?";
 	private static final String DELETE_COMPUTER_WHERE_COMPANY = "DELETE FROM computer WHERE company_id = ?";
-	private static DAOCompany daoCompany;
+	@Autowired
 	private ConnectionHandler connectionHandler;
 
-	private DAOCompany() {
-		this.connectionHandler = ConnectionHandler.getInstance();
-	}
-
 	/*
-	 * ------------------------------------------ | SINGLETON |
-	 * ------------------------------------------
-	 */
-
-	public static DAOCompany getInstance() {
-		if (daoCompany == null) {
-			daoCompany = new DAOCompany();
-		}
-		return daoCompany;
-	}
-
-	/*
-	 * ------------------------------------------ | ResultSet Cleaning FCs |
+	 * ------------------------------------------ 
+	 * |		 ResultSet Cleaning FCs			|
 	 * ------------------------------------------
 	 */
 
@@ -64,26 +56,14 @@ public class DAOCompany {
 	}
 
 	/*
-	 * ------------------------------------------ | DIVE IN DB FCs |
+	 * ------------------------------------------ 
+	 * | 			DIVE IN DB FCs 				|
 	 * ------------------------------------------
 	 */
 
-	public List<Company> query(String request) throws ClassNotFoundException {
-		List<Company> companies = new ArrayList<Company>();
-		try (Connection connection = connectionHandler.openConnection()) {
-			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery(request);
-			companies = resultSetToList(resultSet);
-		} catch (SQLException exception) {
-
-			exception.printStackTrace();
-		}
-		return companies;
-	}
-
 	public List<Company> queryPreparedStatement(PreparedStatement preparedStatement) throws ClassNotFoundException, CustomSQLException {
 		List<Company> companies = new ArrayList<Company>();
-		try (Connection connection = connectionHandler.openConnection()) {
+		try (Connection connection = connectionHandler.getConnection()) {
 			ResultSet resultSet = preparedStatement.executeQuery();
 			companies = resultSetToList(resultSet);
 		} catch (SQLException exception) {
@@ -92,24 +72,15 @@ public class DAOCompany {
 		return companies;
 	}
 
-	public void execute(String query) throws ClassNotFoundException, CustomSQLException {
-		Statement statement;
-		try (Connection connection = connectionHandler.openConnection()) {
-			statement = connection.createStatement();
-			statement.executeUpdate(query);
-		} catch (SQLException e) {
-			throw new CustomSQLException();
-		}
-	}
-
 	/*
-	 * ------------------------------------------ | Query FCs |
+	 * ------------------------------------------ 
+	 * | 				Query FCs 				|
 	 * ------------------------------------------
 	 */
 
 	public int getIdCompany(String companyName) throws SQLException, CustomSQLException, ClassNotFoundException {
 		String request = SELECT_ID;
-		try (Connection connection = connectionHandler.openConnection();
+		try (Connection connection = connectionHandler.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setString(1, companyName);
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -125,7 +96,7 @@ public class DAOCompany {
 	public List<Company> listCompanies() throws CustomSQLException, ClassNotFoundException {
 		String request = SELECT_ALL_NAME;
 		List<Company> companies = new ArrayList<Company>();
-		try (Connection connection = connectionHandler.openConnection();
+		try (Connection connection = connectionHandler.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			ResultSet resultSet = preparedStatement.executeQuery();
 			companies = resultSetToList(resultSet);
@@ -139,7 +110,7 @@ public class DAOCompany {
 	public List<Company> listCompaniesPageable(Pageable pageable) throws CustomSQLException, ClassNotFoundException {
 		String request = SELECT_ALL_PAGEABLE;
 		List<Company> companies = new ArrayList<Company>();
-		try (Connection connection = connectionHandler.openConnection();
+		try (Connection connection = connectionHandler.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setInt(1, pageable.getLimitParameter());
 			preparedStatement.setInt(2, pageable.getOffsetParameter());
@@ -153,13 +124,14 @@ public class DAOCompany {
 	}
 
 	/*
-	 * ------------------------------------------ | Execute FCs |
+	 * ------------------------------------------ 
+	 * | 				Execute FCs 			|
 	 * ------------------------------------------
 	 */
 
 	public void createCompany(String companyName) throws CustomSQLException, ClassNotFoundException {
 		String request = INSERT_COMPUTER;
-		try (Connection connection = connectionHandler.openConnection();
+		try (Connection connection = connectionHandler.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setString(1, companyName);
 			preparedStatement.execute();
@@ -171,7 +143,7 @@ public class DAOCompany {
 	 public void deleteCompany(Company company) throws SQLException, ClassNotFoundException {
 		    String deleteCompany = DELETE_COMPANY;
 		    String deleteComputer = DELETE_COMPUTER_WHERE_COMPANY;
-		    Connection connection = connectionHandler.openConnection();
+		    Connection connection = connectionHandler.getConnection();
 		    try (	PreparedStatement preparedStatementDeleteCompany = connection.prepareStatement(deleteCompany);
 		    		PreparedStatement preparedStatementDeleteComputer = connection.prepareStatement(deleteComputer))
 		    

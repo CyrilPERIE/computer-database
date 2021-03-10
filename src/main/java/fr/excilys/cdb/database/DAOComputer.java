@@ -8,6 +8,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import fr.excilys.cdb.controller.Utilitaire;
 import fr.excilys.cdb.exception.CustomSQLException;
 import fr.excilys.cdb.model.Company;
@@ -15,6 +18,7 @@ import fr.excilys.cdb.model.Company.CompanyBuilder;
 import fr.excilys.cdb.model.Computer;
 import fr.excilys.cdb.model.Computer.ComputerBuilder;
 
+@Component
 public class DAOComputer {
 
 	private static final String PAGEABLE = " limit ? offset ?";
@@ -39,52 +43,8 @@ public class DAOComputer {
 			+ "FROM computer " 
 			+ "LEFT JOIN company ON company.id = computer.company_id " 
 			+ PAGEABLE;
-	private static DAOComputer daoComputer;
+	@Autowired
 	private ConnectionHandler connectionHandler;
-
-	private DAOComputer() {
-		this.connectionHandler = ConnectionHandler.getInstance();
-	}
-
-	/*
-	 * ------------------------------------------ 
-	 * |				 SINGLETON 				|
-	 * ------------------------------------------
-	 */
-
-	public static DAOComputer getInstance() {
-		if (daoComputer == null) {
-			daoComputer = new DAOComputer();
-		}
-		return daoComputer;
-	}
-
-	/*
-	 * ------------------------------------------ 
-	 * |			 DIVE IN DB FCs 			|
-	 * ------------------------------------------
-	 */
-
-	public ResultSet query(String query) throws ClassNotFoundException, CustomSQLException {
-		ResultSet resultSet = null;
-		try (Connection connection = connectionHandler.openConnection()) {
-			Statement statement = connection.createStatement();
-			resultSet = statement.executeQuery(query);
-		} catch (SQLException exception) {
-			throw new CustomSQLException();
-		}
-		return resultSet;
-	}
-
-	public void execute(String query) throws CustomSQLException, ClassNotFoundException {
-		Statement statement;
-		try (Connection connection = connectionHandler.openConnection()) {
-			statement = connection.createStatement();
-			statement.executeUpdate(query);
-		} catch (SQLException e) {
-			throw new CustomSQLException();
-		}
-	}
 
 	/*
 	 * ------------------------------------------ 
@@ -126,7 +86,7 @@ public class DAOComputer {
 	public List<Computer> listComputersPageable(Pageable pageable) throws ClassNotFoundException, CustomSQLException {
 		String request = SELECT_COMPUTERS_PAGEABLE;
 		List<Computer> computers = new ArrayList<>();
-		try (Connection connection = connectionHandler.openConnection();
+		try (Connection connection = connectionHandler.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setInt(1, pageable.getLimitParameter());
 			preparedStatement.setInt(2, pageable.getOffsetParameter());
@@ -145,7 +105,7 @@ public class DAOComputer {
 				+ "ORDER BY " + pageable.getOrderBy()	
 				+ PAGEABLE;
 		List<Computer> computers = new ArrayList<>();
-		try (Connection connection = connectionHandler.openConnection();
+		try (Connection connection = connectionHandler.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setString(1, "%" + pageable.getSearch() + "%");
 			preparedStatement.setInt(2, pageable.getLimitParameter());
@@ -165,7 +125,7 @@ public class DAOComputer {
 		String request = SELECT_ONE_COMPUTER;
 
 		List<Computer> computers = new ArrayList<>();
-		try (Connection connection = connectionHandler.openConnection();
+		try (Connection connection = connectionHandler.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setInt(1, computerId);
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -179,7 +139,7 @@ public class DAOComputer {
 	public int totalNumberComputer(Pageable pageable) throws ClassNotFoundException, CustomSQLException {
 		String request = COUNT_COMPUTERS;
 		int result = 0;
-		try (Connection connection = connectionHandler.openConnection();
+		try (Connection connection = connectionHandler.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setString(1, "%" + pageable.getSearch() + "%");
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -200,7 +160,7 @@ public class DAOComputer {
 
 	public void deleteComputer(int computerId) throws ClassNotFoundException, CustomSQLException {
 		String request = DELETE_COMPUTER;
-		try (Connection connection = connectionHandler.openConnection();
+		try (Connection connection = connectionHandler.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setInt(1, computerId);
 			preparedStatement.execute();
@@ -211,7 +171,7 @@ public class DAOComputer {
 
 	public void createComputer(Computer computer) throws CustomSQLException, ClassNotFoundException {
 		String request = INSERT_COMPUTER;
-		try (Connection connection = connectionHandler.openConnection();
+		try (Connection connection = connectionHandler.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setString(1, computer.getName());
 			preparedStatement.setDate(2,
@@ -230,7 +190,7 @@ public class DAOComputer {
 	
 	public void updateComputer(Computer computer, int computerId) throws ClassNotFoundException, CustomSQLException {
 		String request = UPDATE_COMPUTER;
-		try (Connection connection = connectionHandler.openConnection();
+		try (Connection connection = connectionHandler.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setString(1, computer.getName());
 			preparedStatement.setDate(2,

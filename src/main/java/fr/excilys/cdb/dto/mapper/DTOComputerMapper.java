@@ -19,14 +19,12 @@ public class DTOComputerMapper {
 					.companyId(Integer.valueOf(addComputerFormOutput.getCompanyId()))
 					.build();
 			
-			Computer computer = new ComputerBuilder()
+			return  new ComputerBuilder()
 					.computerManufacturer(company)
 					.computerName(addComputerFormOutput.getComputerName())
 					.computerIntroducedDate(addComputerFormOutput.getIntroducedDate().isEmpty() ? null: Utilitaire.stringToDateWebUI(addComputerFormOutput.getIntroducedDate()))
 					.computerDiscontinuedDate(addComputerFormOutput.getDiscontinuedDate().isEmpty() ? null: Utilitaire.stringToDateWebUI(addComputerFormOutput.getDiscontinuedDate()))
 					.build();
-
-			return computer;
 		} catch(ParseException e) {
 			System.out.println(e.getMessage());
 			throw new ParseError();
@@ -39,15 +37,13 @@ public class DTOComputerMapper {
 					.companyId(Integer.valueOf(editComputerFormInput.getCompanyId()))
 					.build();
 			
-			Computer computer = new ComputerBuilder()
+			return new ComputerBuilder()
 					.computerId(Integer.valueOf(editComputerFormInput.getComputerId()))
 					.computerManufacturer(company)
 					.computerName(editComputerFormInput.getComputerName())
 					.computerIntroducedDate(editComputerFormInput.getIntroducedDate().isEmpty() ? null: Utilitaire.stringToDateWebUI(editComputerFormInput.getIntroducedDate()))
 					.computerDiscontinuedDate(editComputerFormInput.getDiscontinuedDate().isEmpty() ? null: Utilitaire.stringToDateWebUI(editComputerFormInput.getDiscontinuedDate()))
 					.build();
-
-			return computer;
 		} catch(ParseException e) {
 			System.out.println(e.getMessage());
 			throw new ParseError();

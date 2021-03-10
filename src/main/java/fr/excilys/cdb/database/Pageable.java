@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
 public class Pageable {
 	
 	private int offsetParameter = 0;
 	private int limitParameter = 10;
-	private int max;
+	private int maxComputer;
 	private String search;
 	private String orderBy;
 	
@@ -20,14 +21,13 @@ public class Pageable {
 	 * ------------------------------------------
 	 */
 	
-	public Pageable(int max) {
-		this.max = max;
+	public Pageable() {
 		this.search = "";
 		this.orderBy = "computer.id";
 	}	
 	
 	public void next() {
-		if(offsetParameter+limitParameter < max) {
+		if(offsetParameter+limitParameter < maxComputer) {
 			offsetParameter += limitParameter;
 		}
 	}
@@ -39,11 +39,11 @@ public class Pageable {
 	}
 	
 	public List<Integer> sendPageIndexes() {
-	List<Integer> result = new ArrayList<Integer>();
+	List<Integer> result = new ArrayList<>();
 
 	int count = 1;
-	int numberOfIndexWeWant = (max / limitParameter > NUMBER_OF_INDEXES ? NUMBER_OF_INDEXES : max / limitParameter);
-	int maxIndex = max / limitParameter;
+	int numberOfIndexWeWant = (maxComputer / limitParameter > NUMBER_OF_INDEXES ? NUMBER_OF_INDEXES : maxComputer / limitParameter);
+	int maxIndex = maxComputer / limitParameter;
 	int	minIndex = 0;
 	int middleIndex = offsetParameter / limitParameter;
 	result.add(middleIndex);
@@ -89,11 +89,11 @@ public class Pageable {
 	public void setLimitParameter(int limitParameter) {
 		this.limitParameter = limitParameter;
 	}
-	public int getMax() {
-		return max;
+	public int getMaxComputer() {
+		return maxComputer;
 	}
-	public void setMax(int max) {
-		this.max = max;
+	public void setMaxComputer(int max) {
+		this.maxComputer = max;
 	}
 
 	public String getSearch() {

@@ -3,37 +3,25 @@ package fr.excilys.cdb.controller;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import fr.excilys.cdb.database.Pageable;
 import fr.excilys.cdb.exception.CustomSQLException;
 import fr.excilys.cdb.model.Company;
 import fr.excilys.cdb.services.ServiceCompany;
 import fr.excilys.cdb.view.View;
 
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ControllerCompany {
 	
+	@Autowired
 	private ServiceCompany serviceCompany;
-	private static ControllerCompany controllerCompany;
+	@Autowired
 	private static View view;
-
-	private ControllerCompany() {
-		this.serviceCompany = ServiceCompany.getServiceCompanyInstance();
-	}
-	
-	public static void setView() {
-		view = View.getViewInstance();
-	}
-	/*
-	 * ------------------------------------------ 
-	 * | 				SINGLETON				|
-	 * ------------------------------------------
-	 */
-
-	public static ControllerCompany getInstance() {
-		if (controllerCompany == null) {
-			controllerCompany = new ControllerCompany();
-		}
-		return controllerCompany;
-	}
 
 	/*
 	 * ------------------------------------------ 
