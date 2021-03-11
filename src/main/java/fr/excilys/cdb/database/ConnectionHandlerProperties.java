@@ -6,7 +6,7 @@ import java.util.Properties;
 
 public class ConnectionHandlerProperties {
 	
-	private static ConnectionHandlerProperties INSTANCE;
+	private static ConnectionHandlerProperties instance;
 	private String PATH_PROPERTIES = "database.properties";
 	private InputStream inputStream;
 	Properties properties = new Properties();
@@ -27,7 +27,7 @@ public class ConnectionHandlerProperties {
 		
 		inputStream = this.getClass().getClassLoader().getResourceAsStream(PATH_PROPERTIES);
 		
-		if(inputStream != null) {
+		if (inputStream != null) {
 			try {
 				properties.load(inputStream);
 			} catch (IOException e) {
@@ -50,10 +50,10 @@ public class ConnectionHandlerProperties {
 	 */
 
 	public static synchronized ConnectionHandlerProperties getInstance() {
-		if(ConnectionHandlerProperties.INSTANCE == null) {
-			ConnectionHandlerProperties.INSTANCE = new ConnectionHandlerProperties();
+		if (ConnectionHandlerProperties.instance == null) {
+			ConnectionHandlerProperties.instance = new ConnectionHandlerProperties();
 		}
-	return ConnectionHandlerProperties.INSTANCE;
+	return ConnectionHandlerProperties.instance;
 	}
 	
 

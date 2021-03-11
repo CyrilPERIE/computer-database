@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class LoggerInstance {
 	
-	private static final Logger logger = LoggerFactory.getLogger(LoggerInstance.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LoggerInstance.class);
 	
 	public static void expectLoop(String message) {
-        logger.debug(message); 
+        LOGGER.debug(message); 
 	}
 	
 	public enum Messages {
@@ -28,7 +28,7 @@ public class LoggerInstance {
 		
 		private String message;
 		
-		private Messages(String message) {
+		Messages(String message) {
 			this.message = message;
 		}
 		
@@ -39,7 +39,7 @@ public class LoggerInstance {
 	}
 
 	public static Logger getLogger() {
-		return logger;
+		return LOGGER;
 	}
 	
 }

@@ -18,39 +18,41 @@ import fr.excilys.cdb.exception.ParseError;
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ValidatorAddComputer {
-	
+
 	/*
-	 * ------------------------------------------ 
-	 * | 				Test Fcs				|
+	 * ------------------------------------------ | Test Fcs |
 	 * ------------------------------------------
 	 */
-	
-	public static void validate(AddComputerFormOutput addComputerFormOutput) throws ParseError, EmptyError, CustomDateException {
+
+	public static void validate(AddComputerFormOutput addComputerFormOutput)
+			throws ParseError, EmptyError, CustomDateException {
 		validateComputerName(addComputerFormOutput.getComputerName());
-		validateDiscontinuedDateAfterIntroducedDate(addComputerFormOutput.getIntroducedDate(), addComputerFormOutput.getDiscontinuedDate());
+		validateDiscontinuedDateAfterIntroducedDate(addComputerFormOutput.getIntroducedDate(),
+				addComputerFormOutput.getDiscontinuedDate());
 	}
-	
+
 	private static void validateComputerName(String computerName) throws EmptyError {
-		if(computerName.isEmpty()) {
+		if (computerName.isEmpty()) {
 			throw new EmptyError();
 		}
 	}
-	
+
 	private static boolean validateDate(String date) throws ParseError {
-		if(!date.isEmpty()) {
+		if (!date.isEmpty()) {
 			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-	        try {
-	            dateFormat.parse(date);
-	            return true;
-	        } catch (ParseException e) {
-	            throw new ParseError();
-	        }
+			try {
+				dateFormat.parse(date);
+				return true;
+			} catch (ParseException e) {
+				throw new ParseError();
+			}
 		}
 		return false;
 	}
-	
-	private static boolean validateDiscontinuedDateAfterIntroducedDate(String introducedDate, String discontinuedDate) throws ParseError, CustomDateException {
-		if(validateDate(discontinuedDate) && validateDate(introducedDate)) {
+
+	private static boolean validateDiscontinuedDateAfterIntroducedDate(String introducedDate, String discontinuedDate)
+			throws ParseError, CustomDateException {
+		if (validateDate(discontinuedDate) && validateDate(introducedDate)) {
 			Date discontinuedDateDate;
 			Date introducedDateDate;
 			try {
@@ -59,16 +61,14 @@ public class ValidatorAddComputer {
 			} catch (ParseException e) {
 				return false;
 			}
-			
-			if(discontinuedDateDate.getTime() >= introducedDateDate.getTime()) {
+
+			if (discontinuedDateDate.getTime() >= introducedDateDate.getTime()) {
 				return true;
-			}
-			else {
+			} else {
 				throw new CustomDateException();
 			}
 		}
 		return false;
 	}
-	
-}
 
+}

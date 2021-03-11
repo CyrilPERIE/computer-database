@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,7 +99,7 @@ public class DAOComputer {
 
 	}
 	
-	public List<Computer> selectComputersLikePageableOrderBy(Pageable pageable) throws ClassNotFoundException, CustomSQLException {
+	public List<Computer> selectComputersLikePageableOrderBy(Pageable pageable) throws CustomSQLException {
 		String request = SELECT_COMPUTERS_LIKE
 				+ "ORDER BY " + pageable.getOrderBy()	
 				+ PAGEABLE;
@@ -188,7 +187,7 @@ public class DAOComputer {
 
 	}
 	
-	public void updateComputer(Computer computer, int computerId) throws ClassNotFoundException, CustomSQLException {
+	public void updateComputer(Computer computer, int computerId) throws CustomSQLException {
 		String request = UPDATE_COMPUTER;
 		try (Connection connection = connectionHandler.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
@@ -203,6 +202,7 @@ public class DAOComputer {
 			preparedStatement.setInt(5, computerId);
 			preparedStatement.execute();
 		} catch (SQLException e) {
+			System.out.println(e.getMessage());
 			throw new CustomSQLException(e.getMessage());
 		}
 
