@@ -21,12 +21,12 @@
             <div class="row">
                 <div class="col-xs-8 col-xs-offset-2 box">
                     <div class="label label-default pull-right">
-                        id: ${editComputerFormInput.companyId}
+                        id: ${editComputerFormInput.computerId}
                     </div>
                     <h1>Edit Computer</h1>
 
                     <form action="editComputer" method="POST">
-                        <input name="computerId" type="hidden" value="${editComputerFormInput.companyId}" id="id"/> 
+                        <input name="computerId" type="hidden" value="${editComputerFormInput.computerId}" id="id"/> 
                         <fieldset>
                             <div class="form-group">
                                 <label for="computerName">Computer name</label>

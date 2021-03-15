@@ -80,9 +80,9 @@ public class ServletAddComputer extends HttpServlet {
 			Computer computer = DTOComputerMapper.addComputerFormOutputToComputer(addComputerFormOutput);
 			serviceComputer.createComputer(computer);
 		} catch (ParseError parseError) {
-			errors.put("dateField",parseError.parseErrorDetected());
+			errors.put("dateField", parseError.parseErrorDetected());
 		} catch (EmptyError emptyError) {
-			errors.put("computerNameField",emptyError.emptyComputerName());
+			errors.put("computerNameField", emptyError.emptyComputerName());
 		} catch (CustomSQLException customSQLException) {
 			customSQLException.connectionLostDetected();
 		} catch (ClassNotFoundException e) {

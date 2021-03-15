@@ -7,7 +7,7 @@ import fr.excilys.cdb.model.Computer;
 public class ComputerDTOMapper {
 
 	public static EditComputerFormInput computerToAddComputerFormOutput(Computer computer) {
-		
+		System.out.println(computer.getManufacturer());
 		return new EditComputerFormInput.EditComputerFormInputBuilder()
 										.withComputerId(String.valueOf(computer.getId()))
 										.withComputerName(computer.getName())

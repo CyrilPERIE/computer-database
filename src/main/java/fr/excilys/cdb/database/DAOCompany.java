@@ -1,18 +1,15 @@
 package fr.excilys.cdb.database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import fr.excilys.cdb.SpringConfig;
 import fr.excilys.cdb.exception.CustomSQLException;
 import fr.excilys.cdb.model.Company;
 
@@ -27,50 +24,7 @@ public class DAOCompany {
 	private static final String DELETE_COMPANY = "DELETE FROM company WHERE id = ?";
 	private static final String DELETE_COMPUTER_WHERE_COMPANY = "DELETE FROM computer WHERE company_id = ?";
 	@Autowired
-	private ConnectionHandler connectionHandler;
-
-	/*
-	 * ------------------------------------------ 
-	 * |		 ResultSet Cleaning FCs			|
-	 * ------------------------------------------
-	 */
-
-	private Company resultSetToCompanyObject(ResultSet resultSet) throws SQLException {
-		Company company = null;
-		try {
-			company = new Company.CompanyBuilder().companyId(resultSet.getInt("id"))
-					.computerName(resultSet.getString("name")).build();
-
-		} catch (SQLException e) {
-			throw e;
-		}
-		return company;
-	}
-
-	private List<Company> resultSetToList(ResultSet resultSet) throws SQLException {
-		List<Company> companies = new ArrayList<Company>();
-		while (resultSet.next()) {
-			companies.add(resultSetToCompanyObject(resultSet));
-		}
-		return companies;
-	}
-
-	/*
-	 * ------------------------------------------ 
-	 * | 			DIVE IN DB FCs 				|
-	 * ------------------------------------------
-	 */
-
-	public List<Company> queryPreparedStatement(PreparedStatement preparedStatement) throws ClassNotFoundException, CustomSQLException {
-		List<Company> companies = new ArrayList<Company>();
-		try (Connection connection = connectionHandler.getConnection()) {
-			ResultSet resultSet = preparedStatement.executeQuery();
-			companies = resultSetToList(resultSet);
-		} catch (SQLException exception) {
-			throw new CustomSQLException();
-		}
-		return companies;
-	}
+	private SpringConfig springConfig;
 
 	/*
 	 * ------------------------------------------ 
@@ -79,47 +33,20 @@ public class DAOCompany {
 	 */
 
 	public int getIdCompany(String companyName) throws SQLException, CustomSQLException, ClassNotFoundException {
-		String request = SELECT_ID;
-		try (Connection connection = connectionHandler.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
-			preparedStatement.setString(1, companyName);
-			ResultSet resultSet = preparedStatement.executeQuery();
-			resultSet.next();
-			int result = resultSet.getInt("id");
-			return result;
-		} catch (Exception e) {
-			createCompany(companyName);
-			return getIdCompany(companyName);
-		}
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(springConfig.dataSource());
+		return jdbcTemplate.queryForObject(SELECT_ID, Integer.class, companyName);
 	}
 	
 	public List<Company> listCompanies() throws CustomSQLException, ClassNotFoundException {
-		String request = SELECT_ALL_NAME;
-		List<Company> companies = new ArrayList<Company>();
-		try (Connection connection = connectionHandler.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
-			ResultSet resultSet = preparedStatement.executeQuery();
-			companies = resultSetToList(resultSet);
-		} catch (SQLException e) {
-			throw new CustomSQLException();
-		}
-		return companies;
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(springConfig.dataSource());
+		return jdbcTemplate.query(SELECT_ALL_NAME, new CompanyRowMapper());
 
 	}
 	
-	public List<Company> listCompaniesPageable(Pageable pageable) throws CustomSQLException, ClassNotFoundException {
-		String request = SELECT_ALL_PAGEABLE;
-		List<Company> companies = new ArrayList<Company>();
-		try (Connection connection = connectionHandler.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
-			preparedStatement.setInt(1, pageable.getLimitParameter());
-			preparedStatement.setInt(2, pageable.getOffsetParameter());
-			ResultSet resultSet = preparedStatement.executeQuery();
-			companies = resultSetToList(resultSet);
-		} catch (SQLException e) {
-			throw new CustomSQLException();
-		}
-		return companies;
+	public List<Company> listCompaniesPageable(Pageable pageable) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(springConfig.dataSource());
+		return jdbcTemplate.query(SELECT_ALL_PAGEABLE, new CompanyRowMapper(), pageable.getLimitParameter(), pageable.getOffsetParameter());
+
 
 	}
 
@@ -129,46 +56,14 @@ public class DAOCompany {
 	 * ------------------------------------------
 	 */
 
-	public void createCompany(String companyName) throws CustomSQLException, ClassNotFoundException {
-		String request = INSERT_COMPUTER;
-		try (Connection connection = connectionHandler.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
-			preparedStatement.setString(1, companyName);
-			preparedStatement.execute();
-		} catch (SQLException e) {
-			throw new CustomSQLException();
-		}
+	public void createCompany(String companyName) throws CustomSQLException {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(springConfig.dataSource());
+		jdbcTemplate.update(INSERT_COMPUTER, companyName);
 	}
 	
 	 public void deleteCompany(Company company) throws SQLException, ClassNotFoundException {
-		    String deleteCompany = DELETE_COMPANY;
-		    String deleteComputer = DELETE_COMPUTER_WHERE_COMPANY;
-		    Connection connection = connectionHandler.getConnection();
-		    try (	PreparedStatement preparedStatementDeleteCompany = connection.prepareStatement(deleteCompany);
-		    		PreparedStatement preparedStatementDeleteComputer = connection.prepareStatement(deleteComputer))
-		    
-		    {
-		    	connection.setAutoCommit(false);
-				
-		    	preparedStatementDeleteComputer.setInt(1, company.getId());
-		    	preparedStatementDeleteComputer.executeUpdate();
-				
-				preparedStatementDeleteCompany.setInt(1, company.getId());
-				preparedStatementDeleteCompany.executeUpdate();
-				
-				connection.commit();
-			}catch(SQLException errorSQL){
-				try {
-					connection.rollback();
-			        } catch (SQLException e) {
-			        	
-			        }
-			}finally {
-				try {
-					connection.close();
-				} catch (SQLException e) {
-					
-				}
-			}
-		  }
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(springConfig.dataSource());
+		jdbcTemplate.update(DELETE_COMPUTER_WHERE_COMPANY, company.getId());
+		jdbcTemplate.update(DELETE_COMPANY, company.getId());
+	 }
 }

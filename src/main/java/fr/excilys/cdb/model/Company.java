@@ -12,16 +12,12 @@ public class Company {
 		private int id;
 		private String name;
 		
-		public CompanyBuilder() {
-			
-		}
-		
 		public CompanyBuilder companyId(int id) {
 			this.id = id;
 			return this;
 		}
 		
-		public CompanyBuilder computerName(String name) {
+		public CompanyBuilder companyName(String name) {
 			this.name = name;
 			return this;
 		}

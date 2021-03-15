@@ -1,154 +1,73 @@
 package fr.excilys.cdb.database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import fr.excilys.cdb.SpringConfig;
 import fr.excilys.cdb.controller.Utilitaire;
-import fr.excilys.cdb.exception.CustomSQLException;
-import fr.excilys.cdb.model.Company;
-import fr.excilys.cdb.model.Company.CompanyBuilder;
 import fr.excilys.cdb.model.Computer;
-import fr.excilys.cdb.model.Computer.ComputerBuilder;
 
 @Component
 public class DAOComputer {
 
+	private static final String LEFT_JOIN = "LEFT JOIN company ON company.id = computer.company_id ";
+	private static final String FROM_COMPUTER = "FROM computer ";
 	private static final String PAGEABLE = " limit ? offset ?";
 	private static final String SELECT_COMPUTERS_LIKE = "SELECT computer.name, computer.introduced, computer.discontinued, computer.id, company.name "
-				+ "FROM computer "
-				+ "LEFT JOIN company ON company.id = computer.company_id " 
+				+ FROM_COMPUTER
+				+ LEFT_JOIN 
 				+ "WHERE computer.name LIKE ? ";
 	private static final String UPDATE_COMPUTER = "UPDATE computer "
 			+ "SET name = ?, introduced = ?, discontinued = ?, company_id = ? "
 			+ "WHERE id = ?";
 	private static final String DELETE_COMPUTER = "DELETE FROM computer where id = ?";
 	private static final String INSERT_COMPUTER = "INSERT INTO computer VALUES (null, ?, ?, ?, ? )";
-	private static final String SELECT_ONE_COMPUTER = "SELECT computer.name, computer.introduced, computer.discontinued, computer.id, company.name"
+	private static final String SELECT_ONE_COMPUTER = "SELECT computer.id, computer.name, computer.introduced, computer.discontinued, company.name, company.id"
 			+ " FROM computer"
 			+ " LEFT JOIN company ON company.id = computer.company_id" 
 			+ " WHERE computer.id = ? ";
 	private static final String COUNT_COMPUTERS = "SELECT COUNT(computer.id) "
-			+ "FROM computer "
-			+ "LEFT JOIN company ON company.id = computer.company_id " 
+			+ FROM_COMPUTER
+			+ LEFT_JOIN 
 			+ "WHERE computer.name LIKE ? ";
 	private static final String SELECT_COMPUTERS_PAGEABLE = "SELECT computer.name, computer.introduced, computer.discontinued, computer.id, company.name "
-			+ "FROM computer " 
-			+ "LEFT JOIN company ON company.id = computer.company_id " 
+			+ FROM_COMPUTER 
+			+ LEFT_JOIN 
 			+ PAGEABLE;
 	@Autowired
-	private ConnectionHandler connectionHandler;
-
-	/*
-	 * ------------------------------------------ 
-	 * | 			ResultSet Cleaning FCs 		|
-	 * ------------------------------------------
-	 */
-
-	public Computer resultSetToComputerObject(ResultSet resultSet) throws SQLException {
-		Computer computer = null;
-		try {
-			Company company = new CompanyBuilder().companyId(resultSet.getInt("computer.id"))
-					.computerName(resultSet.getString("company.name")).build();
-
-			computer = new ComputerBuilder().computerId(resultSet.getInt("computer.id")).computerManufacturer(company)
-					.computerName(resultSet.getString("computer.name"))
-					.computerIntroducedDate(resultSet.getDate("computer.introduced"))
-					.computerDiscontinuedDate(resultSet.getDate("computer.discontinued")).build();
-
-		} catch (SQLException e) {
-			throw e;
-		}
-		return computer;
-	}
-
-	private List<Computer> resultSetToList(ResultSet resultSet) throws SQLException {
-		List<Computer> computers = new ArrayList<>();
-		while (resultSet.next()) {
-			computers.add(resultSetToComputerObject(resultSet));
-		}
-		return computers;
-	}
+	private SpringConfig springConfig;
 
 	/*
 	 * ------------------------------------------ 
 	 * | 				Query FCs 				|
 	 * ------------------------------------------
 	 */
-
-	public List<Computer> listComputersPageable(Pageable pageable) throws ClassNotFoundException, CustomSQLException {
-		String request = SELECT_COMPUTERS_PAGEABLE;
-		List<Computer> computers = new ArrayList<>();
-		try (Connection connection = connectionHandler.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
-			preparedStatement.setInt(1, pageable.getLimitParameter());
-			preparedStatement.setInt(2, pageable.getOffsetParameter());
-			ResultSet resultSet = preparedStatement.executeQuery();
-			computers = resultSetToList(resultSet);
-		} catch (SQLException e) {
-			throw new CustomSQLException();
-		}
-
-		return computers;
-
+	
+	public List<Computer> listComputersPageable(Pageable pageable) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(springConfig.dataSource());
+		return jdbcTemplate.query(SELECT_COMPUTERS_PAGEABLE, new ComputerRowMapper(), pageable.getLimitParameter(), pageable.getOffsetParameter());
 	}
 	
-	public List<Computer> selectComputersLikePageableOrderBy(Pageable pageable) throws CustomSQLException {
+	public List<Computer> selectComputersLikePageableOrderBy(Pageable pageable) {
 		String request = SELECT_COMPUTERS_LIKE
 				+ "ORDER BY " + pageable.getOrderBy()	
 				+ PAGEABLE;
-		List<Computer> computers = new ArrayList<>();
-		try (Connection connection = connectionHandler.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
-			preparedStatement.setString(1, "%" + pageable.getSearch() + "%");
-			preparedStatement.setInt(2, pageable.getLimitParameter());
-			preparedStatement.setInt(3, pageable.getOffsetParameter());
-			ResultSet resultSet = preparedStatement.executeQuery();
-			computers = resultSetToList(resultSet);
-		} catch (SQLException e) {
-			throw new CustomSQLException(e.getMessage());
-		}
-
-		return computers;
-
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(springConfig.dataSource());
+		return jdbcTemplate.query(request, new ComputerRowMapper(), pageable.getLimitParameter(), pageable.getOffsetParameter());
+		
 	}
 
-	public List<Computer> showComputerDetails(int computerId)
-			throws SQLException, ClassNotFoundException, CustomSQLException {
-		String request = SELECT_ONE_COMPUTER;
-
-		List<Computer> computers = new ArrayList<>();
-		try (Connection connection = connectionHandler.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
-			preparedStatement.setInt(1, computerId);
-			ResultSet resultSet = preparedStatement.executeQuery();
-			computers = resultSetToList(resultSet);
-		} catch (SQLException e) {
-			throw new CustomSQLException(e.getMessage());
-		}
-		return computers;
+	public List<Computer> showComputerDetails(int computerId) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(springConfig.dataSource());
+		return jdbcTemplate.query(SELECT_ONE_COMPUTER, new ComputerRowMapper(), computerId);
 	}
 
-	public int totalNumberComputer(Pageable pageable) throws ClassNotFoundException, CustomSQLException {
-		String request = COUNT_COMPUTERS;
-		int result = 0;
-		try (Connection connection = connectionHandler.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
-			preparedStatement.setString(1, "%" + pageable.getSearch() + "%");
-			ResultSet resultSet = preparedStatement.executeQuery();
-			resultSet.next();
-			result = resultSet.getInt("COUNT(computer.id)");
-		} catch (SQLException e) {
-			throw new CustomSQLException(e.getMessage());
-		}
-
-		return result;
+	public int totalNumberComputer(Pageable pageable) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(springConfig.dataSource());
+		return jdbcTemplate.queryForObject(COUNT_COMPUTERS, Integer.class, "%" + pageable.getSearch() + "%");
 	}
 
 	/*
@@ -157,54 +76,27 @@ public class DAOComputer {
 	 * ------------------------------------------
 	 */
 
-	public void deleteComputer(int computerId) throws ClassNotFoundException, CustomSQLException {
-		String request = DELETE_COMPUTER;
-		try (Connection connection = connectionHandler.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
-			preparedStatement.setInt(1, computerId);
-			preparedStatement.execute();
-		} catch (SQLException e) {
-			throw new CustomSQLException(e.getMessage());
-		}
-	}
+	public void deleteComputer(int computerId) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(springConfig.dataSource());
+		jdbcTemplate.update(DELETE_COMPUTER, computerId);
+	}	
 
-	public void createComputer(Computer computer) throws CustomSQLException, ClassNotFoundException {
-		String request = INSERT_COMPUTER;
-		try (Connection connection = connectionHandler.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
-			preparedStatement.setString(1, computer.getName());
-			preparedStatement.setDate(2,
-					computer.getIntroducedDate() != null ? Utilitaire.LocalDateToDate(computer.getIntroducedDate())
-							: null);
-			preparedStatement.setDate(3,
-					computer.getDiscontinuedDate() != null ? Utilitaire.LocalDateToDate(computer.getDiscontinuedDate())
-							: null);
-			preparedStatement.setInt(4, computer.getManufacturer().getId());
-			preparedStatement.execute();
-		} catch (SQLException e) {
-			throw new CustomSQLException(e.getMessage());
-		}
+	public void createComputer(Computer computer) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(springConfig.dataSource());
+		jdbcTemplate.update(INSERT_COMPUTER, computer.getName(),
+				computer.getIntroducedDate() != null ? Utilitaire.LocalDateToDate(computer.getIntroducedDate())	: null,
+				computer.getDiscontinuedDate() != null ? Utilitaire.LocalDateToDate(computer.getDiscontinuedDate())	: null,
+				computer.getManufacturer().getId());
 
 	}
 	
-	public void updateComputer(Computer computer, int computerId) throws CustomSQLException {
-		String request = UPDATE_COMPUTER;
-		try (Connection connection = connectionHandler.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
-			preparedStatement.setString(1, computer.getName());
-			preparedStatement.setDate(2,
-					computer.getIntroducedDate() != null ? Utilitaire.LocalDateToDate(computer.getIntroducedDate())
-							: null);
-			preparedStatement.setDate(3,
-					computer.getDiscontinuedDate() != null ? Utilitaire.LocalDateToDate(computer.getDiscontinuedDate())
-							: null);
-			preparedStatement.setInt(4, computer.getManufacturer().getId());
-			preparedStatement.setInt(5, computerId);
-			preparedStatement.execute();
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			throw new CustomSQLException(e.getMessage());
-		}
+	public void updateComputer(Computer computer, int computerId) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(springConfig.dataSource());
+		jdbcTemplate.update(UPDATE_COMPUTER, computer.getName(),
+				computer.getIntroducedDate() != null ? Utilitaire.LocalDateToDate(computer.getIntroducedDate())	: null,
+				computer.getDiscontinuedDate() != null ? Utilitaire.LocalDateToDate(computer.getDiscontinuedDate())	: null,
+				computer.getManufacturer().getId(),
+				computerId);
 
 	}
 

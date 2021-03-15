@@ -56,7 +56,7 @@ public class ServletEditComputer extends HttpServlet {
 			}
 		}
 		
-		List<Company> companies = new ArrayList<Company>();
+		List<Company> companies = new ArrayList<>();
 		try {
 			companies = serviceCompany.listCompanies();
 		} catch (CustomSQLException customSQLException) {
@@ -76,13 +76,10 @@ public class ServletEditComputer extends HttpServlet {
 				discontinuedDate = request.getParameter("discontinuedDate"),
 				companyId = request.getParameter("companyId"),
 				computerId = request.getParameter("computerId");
-		System.out.println(computerId);
 		
 		EditComputerFormInput editComputerFormInput = new EditComputerFormInput.EditComputerFormInputBuilder()
 				.withComputerName(computerName).withDiscontinuedDate(discontinuedDate)
 				.withIntroducedDate(introducedDate).withCompanyId(companyId).withComputerId(computerId).build();
-		
-		System.out.println("editComputerFormInput : "  + editComputerFormInput);
 		validateUserEntries(editComputerFormInput);
 		doGet(request, response);
 	}
@@ -91,11 +88,13 @@ public class ServletEditComputer extends HttpServlet {
 		try {
 			ValidatorEditComputer.validate(editComputerFormInput);
 			Computer computer = DTOComputerMapper.editComputerFormOutputToComputer(editComputerFormInput);
+			System.out.println(computer);
+			System.out.println(computer.getManufacturer().getId());
 			serviceComputer.updateComputer(computer, computer.getId());
 		} catch (ParseError parseError) {
-			errors.put("dateField",parseError.parseErrorDetected());
+			errors.put("dateField", parseError.parseErrorDetected());
 		} catch (EmptyError emptyError) {
-			errors.put("computerNameField",emptyError.emptyComputerName());
+			errors.put("computerNameField", emptyError.emptyComputerName());
 		} catch (CustomSQLException customSQLException) {
 			customSQLException.connectionLostDetected();
 		} catch (ClassNotFoundException e) {

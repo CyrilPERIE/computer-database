@@ -1,10 +1,16 @@
 package fr.excilys.cdb;
 
+import javax.sql.DataSource;
+
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.AbstractContextLoaderInitializer;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @ComponentScan({ "fr.excilys.cdb.database", "fr.excilys.cdb.services",
@@ -16,6 +22,12 @@ public class SpringConfig extends AbstractContextLoaderInitializer {
 		AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
 		context.register(SpringConfig.class);
 		return context;
+	}
+	
+	@Bean
+	public DataSource dataSource() {
+		System.out.println("la");
+		return new HikariDataSource(new HikariConfig("/hikariConfig.properties"));
 	}
 
 }
